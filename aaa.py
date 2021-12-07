@@ -1,4 +1,0 @@
-from typing_extensions import _AnnotatedAlias
-
-
-_AnnotatedAlias
