@@ -1,4 +1,2 @@
-from typing_extensions import _AnnotatedAlias
-
-
-_AnnotatedAlias
+import math
+print(math.ceil(math.sqrt(417)/6+0.5))
