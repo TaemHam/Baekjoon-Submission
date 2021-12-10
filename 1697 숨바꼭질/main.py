@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-from collections import deque
+#from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,42 +21,18 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    m, n = list(map(int,input().split()))
-    mat = [[-1]*(m+2)]+[[-1]+list(map(int,sys.stdin.readline().split()))+[-1] for _ in range (n)]+[[-1]*(m+2)]
-    grp = {}
-    que = deque()
-    zcnt = 0
-    for i in range(1,n+1): #i는 가로행
-        for j in range(1,m+1): #j는 세로열
-            if mat[i][j] == 1: que.append((i,j))
-            elif mat[i][j] == 0: zcnt += 1
-            if mat[i][j] !=-1:
-                movp = []
-                if mat[i-1][j] != -1: movp.append((i-1,j))
-                if mat[i+1][j] != -1: movp.append((i+1,j))
-                if mat[i][j-1] != -1: movp.append((i,j-1))
-                if mat[i][j+1] != -1: movp.append((i,j+1))
-                grp[(i,j)] = movp
-    if zcnt != 0:
-        day = 0
-        size = len(que)
-        cnt = 0
-        while que:
-            if size == cnt:
-                day+=1
-                size = len(que)
-                cnt = 0
-            cur = que.popleft()
-            cnt += 1
-            if cur in grp:
-                que += [i for i in grp[cur]]
-                del grp[cur]
-        else: day -= 1
-        if len(grp) != 0: print(-1)
-        else: print(day)
-    else: print(0)
-            
-
+    n, k = map(int,input().split())
+    p = k-n
+    if p <= 0: 
+        print(-p) 
+        return
+    d = [0,1] + [100001] * (10**5)
+    for i in range(1,p+1):
+        d[i+1] = d[i] + 1
+        if (n+i+1)%2 == 0: d[i+1] = min([d[abs(((n+i+1)//2)-n)]+1,d[i+1]])
+        d[i] = min([d[i+1]+1,d[i]])
+    print(d[p])
+    return
 
     # ######## INPUT AREA END ############
 
