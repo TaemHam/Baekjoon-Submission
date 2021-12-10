@@ -22,7 +22,7 @@ sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 c = int(input())
 for loop in range(c):
-    m, n, k = list(map(int,input().split()))
+    m, n, k = map(int,input().split())
     g = deque([tuple(map(int,sys.stdin.readline().split())) for _ in range(k)])
     dx = [0,0,1,-1]
     dy = [1,-1,0,0]
