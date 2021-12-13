@@ -24,13 +24,13 @@ def main(f=None):
 
     n,m = map(int,input().split())
     g = [sys.stdin.readline().strip() for _ in range(n)]
-
+    inf = 987654321
     dx = [1,-1,0,0]
     dy = [0,0,1,-1]
 
     q1 = [(0,0)]
     q2 = [(m-1,n-1)]
-    d1 = d2 = [[-1] * m] * n
+    d1 = d2 = [[inf for _ in range(m)] for _ in range(n)]
 
 
     while q1:
@@ -38,7 +38,7 @@ def main(f=None):
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            if 0 <= nx < n and 0 <= ny < m and d1[nx][ny] == -1:
+            if 0 <= nx < n and 0 <= ny < m and d1[nx][ny] == inf:
                 d1[nx][ny] = d1[x][y] + 1
                 if g[nx][ny] == '0':
                     q1.append((nx,ny))
@@ -49,10 +49,8 @@ def main(f=None):
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            if 0 <= nx < n and 0 <= ny < m and d2[nx][ny] == -1:
-
-                d2[nx][ny] = d2[x][y] + 1            # 이 부분에서 d1이 건드려지는 이유가 뭐지???
-
+            if 0 <= nx < n and 0 <= ny < m and d2[nx][ny] == inf:
+                d2[nx][ny] = d2[x][y] + 1           
                 if g[nx][ny] == '0':
                     q2.append((nx,ny))
     
@@ -61,9 +59,11 @@ def main(f=None):
     for i in range(m):
         for j in range(n):
             if g[i][j] == '1':
-                ans = max(ans, d1[i][j] + d2[i][j])
-
-    print(ans)
+                ans = min(ans, d1[i][j] + d2[i][j])
+    if ans == inf:
+        print(-1)
+    else:
+        print(ans)
 
 
 
