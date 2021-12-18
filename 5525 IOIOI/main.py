@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-from collections import deque
+#from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,18 +21,34 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
+    n = int(input())
+    cnt_until = n + 1
 
-    input = sys.stdin.readline
-    n,m = map(int,input().split())
+    m = int(input())
+    string = input()
+    cnt, ans, p = 0, 0, 0
 
-    arr = [0] + list(map(int, input().split()))
-    for i in range(1,n+1):
-        arr[i] = arr[i-1] + arr[i]
+    while p < m:
+        if string[p] == 'I':
+            cnt += 1
+            if cnt >= cnt_until:
+                ans += 1
+            p += 1
+        else: 
+            cnt = 0
+            p += 1
+            continue
 
-    for _ in range(m):
-        l,r = list(map(int,input().split()))
-        print(arr[r] - arr[l-1])
+        if p >= m:
+            break
     
+        if string[p] == 'O':
+            p += 1
+        else:
+            cnt = 0
+
+    print(ans)
+
         
     # ######## INPUT AREA END ############
 

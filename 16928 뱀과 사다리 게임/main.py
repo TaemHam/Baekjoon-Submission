@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-from collections import deque
+#from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,19 +21,44 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
+    n, m = map(int, input().split())
+    inf = 101
+    board = [0, 0] + [inf] * 99
+    d = dict()
+    for _ in range(n+m):
+        i, j = map(int, input().split())
+        d[i] = j
+    q = [1]
 
-    input = sys.stdin.readline
-    n,m = map(int,input().split())
+    while q:
+        loc = q.pop(0)
 
-    arr = [0] + list(map(int, input().split()))
-    for i in range(1,n+1):
-        arr[i] = arr[i-1] + arr[i]
+        for i in range(1,7):
 
-    for _ in range(m):
-        l,r = list(map(int,input().split()))
-        print(arr[r] - arr[l-1])
-    
-        
+            if loc+i == 100:
+                ans = board[loc] + 1    
+                print(ans)
+                return
+
+            if loc+i in d:
+                if board[d[loc+i]] > board[loc] + 1:
+                    board[d[loc+i]] = board[loc] + 1
+                    board[loc+i] = 1001
+                    q.append(d[loc+i])
+                continue
+            
+            if board[loc+i] != 1001:
+                if board[loc+i] >= board[loc] + 1:
+                    board[loc + i] = board[loc] + 1
+                else:
+                    break
+
+        else:
+            for i in range(6,0,-1):
+                if board[loc+i] == board[loc] + 1:
+                    q.append(loc+i)
+                    break
+
     # ######## INPUT AREA END ############
 
 

@@ -21,19 +21,69 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-
-    input = sys.stdin.readline
-    n,m = map(int,input().split())
-
-    arr = [0] + list(map(int, input().split()))
-    for i in range(1,n+1):
-        arr[i] = arr[i-1] + arr[i]
-
-    for _ in range(m):
-        l,r = list(map(int,input().split()))
-        print(arr[r] - arr[l-1])
+    n = int(input())
+    mat = []
+    for y in range(n):
+        l = input().split()
+        for x in range(n):
+            if l[x] == '9':
+                loc = (x, y)
+                l[x] = '0'
+        mat.append(l)
     
-        
+    dx = [0,-1,1,0]
+    dy = [-1,0,0,1]
+    stomach = 0
+    size = 2
+
+    edible = set(['1'])
+    turn_total = 0
+
+    while True: 
+
+        q = deque([loc])    
+        v = set()
+        breadth = len(q)
+        turn = 0
+        menu = []
+
+        while q:
+            x,y = q.popleft()
+            v.add((x, y))
+            for i in range(4):
+                nx = x + dx[i]
+                ny = y + dy[i]
+                if 0 <= nx < n and 0 <= ny < n and (nx, ny) not in v and mat[ny][nx] in edible.union('0', str(size)):
+                    if mat[ny][nx] in edible:
+                        menu.append((nx,ny))
+                    q.append((nx, ny))
+
+            breadth -= 1
+            if breadth == 0:
+                turn += 1
+                breadth = len(q)
+                if menu:
+                    x,y = min(menu, key = lambda x : (x[1], x[0]))
+                    mat[y][x] = '0'
+                    stomach += 1
+                    if stomach == size:
+                        edible.add(str(size))
+                        size += 1
+                        stomach = 0
+                    loc = (x, y)
+                    turn_total += turn
+                    break
+
+        else: 
+            break
+
+    print(turn_total)
+
+
+
+
+
+
     # ######## INPUT AREA END ############
 
 

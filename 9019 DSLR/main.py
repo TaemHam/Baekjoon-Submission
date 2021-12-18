@@ -21,19 +21,44 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
+    t = int(input())
+    for _ in range(t):
+        n,m = map(int, input().split())
+        l = [0] * 10000
+        q = deque([[n,'']])
 
-    input = sys.stdin.readline
-    n,m = map(int,input().split())
+        while q:
+            cur_n, cmd = q.popleft()
 
-    arr = [0] + list(map(int, input().split()))
-    for i in range(1,n+1):
-        arr[i] = arr[i-1] + arr[i]
+            if cur_n == m:
+                print(cmd)
+                break
 
-    for _ in range(m):
-        l,r = list(map(int,input().split()))
-        print(arr[r] - arr[l-1])
-    
+            t = (2*cur_n)%10000
+            if l[t] == 0:
+                l[t] = 1
+                q.append([t, cmd + 'D'])
+            
+            t = (cur_n-1)%10000
+            if l[t] == 0:
+                l[t] = 1
+                q.append([t, cmd + 'S'])
+            
+            t = cur_n % 1000 * 10 + cur_n // 1000
+            if l[t] == 0:
+                l[t] = 1
+                q.append([t, cmd + 'L'])
+            
+            t = cur_n % 10 * 1000 + cur_n // 10
+            if l[t] == 0:
+                l[t] = 1
+                q.append([t, cmd + 'R'])
+
         
+        
+        
+
+
     # ######## INPUT AREA END ############
 
 

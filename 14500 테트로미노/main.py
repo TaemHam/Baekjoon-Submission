@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-from collections import deque
+#from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,19 +21,43 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-
-    input = sys.stdin.readline
-    n,m = map(int,input().split())
-
-    arr = [0] + list(map(int, input().split()))
-    for i in range(1,n+1):
-        arr[i] = arr[i-1] + arr[i]
-
-    for _ in range(m):
-        l,r = list(map(int,input().split()))
-        print(arr[r] - arr[l-1])
+    n, m = map(int,input().split())
+    mat = []
+    for _ in range(n):
+        mat.append(list(map(int,input().split())))
+    ans = 0
+    for y in range(n):
+        for x in range(m):
+            if x <= m-4:
+                ans = max(ans, sum(mat[y][x:x+4]))
+            if x <= m-3 and y <= n-2:
+                ans = max(ans, sum(mat[y][x:x+3] + [mat[y+1][x+2]]))
+                ans = max(ans, sum(mat[y][x:x+3] + [mat[y+1][x+1]]))
+                ans = max(ans, sum(mat[y][x:x+3] + [mat[y+1][x]]))
+                ans = max(ans, sum(mat[y][x:x+2] + mat[y+1][x+1:x+3]))
+                ans = max(ans, sum(mat[y][x+1:x+3] + mat[y+1][x:x+2]))
+                ans = max(ans, sum([mat[y][x]] + mat[y+1][x:x+3]))
+                ans = max(ans, sum([mat[y][x+1]] + mat[y+1][x:x+3]))
+                ans = max(ans, sum([mat[y][x+2]] + mat[y+1][x:x+3]))
+            if x <= m-2 and y <= n-2:
+                ans = max(ans, sum(mat[y][x:x+2] + mat[y+1][x:x+2]))
+            if x <= m-2 and y <= n-3:
+                ans = max(ans, sum(mat[y][x:x+2] + [mat[y+1][x]] + [mat[y+2][x]]))
+                ans = max(ans, sum([mat[y][x]] + mat[y+1][x:x+2] + [mat[y+2][x]]))
+                ans = max(ans, sum([mat[y][x]] + [mat[y+1][x]] + mat[y+2][x:x+2]))
+                ans = max(ans, sum([mat[y][x]] + mat[y+1][x:x+2] + [mat[y+2][x+1]]))
+                ans = max(ans, sum([mat[y][x+1]] + mat[y+1][x:x+2] + [mat[y+2][x]]))
+                ans = max(ans, sum(mat[y][x:x+2] + [mat[y+1][x+1]] + [mat[y+2][x+1]]))
+                ans = max(ans, sum([mat[y][x+1]] + mat[y+1][x:x+2] + [mat[y+2][x+1]]))
+                ans = max(ans, sum([mat[y][x+1]] + [mat[y+1][x+1]] + mat[y+2][x:x+2]))
+            if y <= n-4:
+                ans = max(ans, mat[y][x] + mat[y+1][x] + mat[y+2][x] + mat[y+3][x])
     
-        
+    print(ans)
+
+
+
+
     # ######## INPUT AREA END ############
 
 

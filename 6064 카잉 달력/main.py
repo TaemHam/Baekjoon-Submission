@@ -20,35 +20,25 @@ def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
-    INF = 101
-    input = sys.stdin.readline
-    n = sum(map(int,input().split()))
-    l = [False] * INF
 
+    n = int(input())
     for _ in range(n):
-        i,j = map(int,input().split())
-        l[j] = i
+        M, N, x, y = map(int, input().split())
+        s = set()
 
-    m = [0, 0, 1, 1, 1, 1, 1, 1]
+        for i in range(0, N):
+            total = x + M*i
+            loop_y = N - (-total % N)
+            if loop_y == y:
+                print(total)
+                break
+            elif loop_y not in s:
+                s.add(loop_y)
+            else:
+                print(-1)
+                break
 
-    for i in range(8,101):
-        q = []
-        for j in range(1,7):
-            q.append(m[i-j] + 1)
-            if l[i-j] != False:
-                if l[i-j] < i-j:
-                    q[j-1] = m[l[i-j]] + 1
-            try:
-                if l.index(i-j) < i-j:
-                    q[j-1] = INF
-            except:
-                None
-
-        m.append(min(q))
-    
-    print(m[100])
-
-
+        
     # ######## INPUT AREA END ############
 
 

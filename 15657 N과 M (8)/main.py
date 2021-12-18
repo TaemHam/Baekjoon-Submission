@@ -3,10 +3,10 @@ import os
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
-#import itertools
+import itertools
 #from itertools import product
 #import collections
-from collections import deque
+#from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,19 +21,12 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
+    n, m = map(int,input().split())
+    l = sorted(list(map(int,input().split())))
+    l = itertools.combinations_with_replacement(l,m)
+    for i in l:
+        print(*i)
 
-    input = sys.stdin.readline
-    n,m = map(int,input().split())
-
-    arr = [0] + list(map(int, input().split()))
-    for i in range(1,n+1):
-        arr[i] = arr[i-1] + arr[i]
-
-    for _ in range(m):
-        l,r = list(map(int,input().split()))
-        print(arr[r] - arr[l-1])
-    
-        
     # ######## INPUT AREA END ############
 
 
