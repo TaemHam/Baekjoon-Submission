@@ -44,7 +44,7 @@ def main(f=None):
 
         q = deque([loc])                                        # q는 bsf에 쓰일 더블엔드큐로 좌표형태로 저장;
 
-        v = set()                                               # 방문한 좌표(v)는 set에 넣어서 빠르게 확인;
+        v = set(loc)                                               # 방문한 좌표(v)는 set에 넣어서 빠르게 확인;
 
         breadth = len(q)                                    ##### breadth 랑 turn 은 같은 거리에 있는 모든 칸 확인하려고 넣었음;
         turn = 0                                            ##### 각 BSF 단계에서 큐를 다 쓸 때마다 거리(turn)를 +1 하는 걸로 구현했음;
@@ -53,13 +53,13 @@ def main(f=None):
                                                                 # 가장 위에 있는 물고기를 먹어야 해서 그거 sort 하려고 넣음;
         while q: 
             x,y = q.popleft()
-            v.add((x, y))
             for i in range(4):
                 nx = x + dx[i]
                 ny = y + dy[i]                    # 밑줄 edible에 union 한 이유는 같은 사이즈 물고기를 먹진 못해도 지나다닐 수 있어서;
                 if 0 <= nx < n and 0 <= ny < n and (nx, ny) not in v and mat[ny][nx] in edible.union('0', str(size)):
                     if mat[ny][nx] in edible:
                         menu.append((nx,ny))                    # 먹을 수 있는 물고기 찾으면 menu에 넣어서 
+                    v.add((nx, ny))
                     q.append((nx, ny))                          # 같은 거리에 있는 다른 물고기도 넣어줌;
 
             breadth -= 1
