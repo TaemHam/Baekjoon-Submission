@@ -8,7 +8,7 @@ import sys
 #import collections
 #from collections import deque
 #from collections import Counter, defaultdict as dd
-import math
+#import math
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
@@ -21,38 +21,28 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def solution(n: int):
-        return search([0] * n, 0)
- 
- 
-    def search(queen: list, row: int):
-        n = len(queen)
-        count = 0
- 
-        if n == row:
-            return 1
- 
-        for col in range(n):
-            queen[row] = col
-            if check(queen, row):
-                count += search(queen, row + 1)
-        return count
- 
- 
-    def check(queen: list, row: int):
-        for i in range(row):
-            if queen[i] == queen[row] or abs(queen[i] - queen[row]) == row - i:
-                return False
- 
-        return True
-                
-    n = int(input())
-    print(solution(n))
+    global pre_o, in_o, post_o
+    n = int(input().strip())
+    d = dict()
+    for i in range(n):
+        a, b, c = input().split()
+        d[a] = (b, c)
 
+    pre_o, in_o, post_o = '', '', ''
 
+    def dfs(rt):
+        global pre_o, in_o, post_o
+        
+        if rt != '.':
+            l, r = d[rt]
+            pre_o += rt
+            dfs(l)
+            in_o += rt
+            dfs(r)
+            post_o += rt
     
-
-    
+    dfs('A')
+    print(pre_o, in_o, post_o, sep='\n')
 
 
     # ######## INPUT AREA END ############

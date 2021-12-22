@@ -21,25 +21,21 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input())
-    l = list(map(int, input().split()))
-    u = [1] * n
-    d = [1] * n
-    for i in range(n):
-        for j in range(i):
-            if l[j] < l[i]:
-                u[i] = max(u[i], u[j]+1)
-                d[i] = u[i]
-
-            if l[j] > l[i]:
-
-                if i == 10 and j == 7:
-                    print(d[i], d[j]+1)
-                    d[i] = max(d[i], d[j]+1)
-                d[i] = max(d[i], d[j]+1)
-                
-    print(d)
-        
+    n = int(input().strip())
+    l = []
+    for _ in range(n):
+        l.append(list(map(int, input().split())))
+    
+    for i in range(1,n):
+        for j in range(i+1):
+            if j == 0:
+                l[i][j] = l[i-1][j] + l[i][j]
+            elif j == i:
+                l[i][j] = l[i-1][j-1] + l[i][j]
+            else:
+                l[i][j] = max(l[i-1][j], l[i-1][j-1]) + l[i][j]
+    
+    print(max(l[-1])) 
 
     # ######## INPUT AREA END ############
 
