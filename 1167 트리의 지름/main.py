@@ -18,34 +18,36 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    sys.setrecursionlimit(10**5)
+    # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
     n = int(input().strip())
-    in_o = list(map(int,input().split()))
-    po_o = list(map(int,input().split()))
-
-    pos = [0] * (n+1)
-    for i in range(n):
-        pos[in_o[i]] = i
+    l = [[] for _ in range(n+1)]
+    for _ in range(n):
+        t = list(map(int, input().split()))
+        k = 1
+        while t[k] != -1:
+            l[t[0]].append((t[k], t[k+1]))
+            k += 2
     
-    def divide(in_start, in_end, p_start, p_end):
-
-        if in_start > in_end or p_start > p_end:
-            return
-        
-        rt = po_o[p_end]
-        print(rt, end='\n')
-
-        l = pos[rt] - in_start                      #rt 기준 왼쪽 자식 갯수
-        r = in_end - pos[rt]                        #rt 기준 오른쪽 자식 갯수
-
-        divide(in_start, in_start+l-1, p_start, p_start+l-1) # 왼쪽 노드 
-        divide(in_end-r+1, in_end, p_end-r, p_end-1) # 오른쪽 노드
-
-    divide(0, n-1, 0, n-1)
-
-       
+    def dfs(q):
+        g = [-1] * (n+1)
+        g[q[0][0]] = 0
+        max_g = [0,0]
+        while q:
+            p, d = q.pop()
+            for np, nd in l[p]:
+                if g[np] != -1:
+                    continue
+                t = nd + d
+                g[np] = t
+                if t > max_g[1]:
+                    max_g = [np, t]
+                q.append((np, t))
+        return max_g
+    m1 = dfs([(1, 0)])
+    m2 = dfs([(m1[0],0)])
+    print(m2[1])
 
     # ######## INPUT AREA END ############
 

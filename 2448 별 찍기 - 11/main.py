@@ -9,7 +9,7 @@ import sys
 #from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
-#from math import log, log2, ceil, floor, gcd, sqrt
+from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
@@ -18,34 +18,30 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    sys.setrecursionlimit(10**5)
+    # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
     n = int(input().strip())
-    in_o = list(map(int,input().split()))
-    po_o = list(map(int,input().split()))
+    c = int(log2(n // 3))
+    l = ['  *  ', ' * * ', '*****']
 
-    pos = [0] * (n+1)
-    for i in range(n):
-        pos[in_o[i]] = i
+    def star(l):
+        len_l = len(l)
+        len_nl = len_l * 2
+        nl = [[] for _ in range(len_nl)]
+        for i in range(len_nl):
+            if i < len_l:
+                nl[i] = ' ' * len_l + l[i] + ' ' * len_l
+            else:
+                j = i%len_l
+                nl[i] = l[j] + ' ' + l[j]
+        return nl
+
+    for _ in range(c):
+        l = star(l)
     
-    def divide(in_start, in_end, p_start, p_end):
+    print(*l, sep= '\n')
 
-        if in_start > in_end or p_start > p_end:
-            return
-        
-        rt = po_o[p_end]
-        print(rt, end='\n')
-
-        l = pos[rt] - in_start                      #rt 기준 왼쪽 자식 갯수
-        r = in_end - pos[rt]                        #rt 기준 오른쪽 자식 갯수
-
-        divide(in_start, in_start+l-1, p_start, p_start+l-1) # 왼쪽 노드 
-        divide(in_end-r+1, in_end, p_end-r, p_end-1) # 오른쪽 노드
-
-    divide(0, n-1, 0, n-1)
-
-       
 
     # ######## INPUT AREA END ############
 

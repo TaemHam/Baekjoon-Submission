@@ -3,7 +3,7 @@ import os
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
-#import itertools
+import itertools
 #from itertools import product
 #import collections
 #from collections import deque
@@ -18,35 +18,15 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    sys.setrecursionlimit(10**5)
+    # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    in_o = list(map(int,input().split()))
-    po_o = list(map(int,input().split()))
-
-    pos = [0] * (n+1)
-    for i in range(n):
-        pos[in_o[i]] = i
+    n, m = map(int, input().split())
+    l = list(map(int, input().split()))
+    a = sorted(set(list(itertools.permutations(l, m))))
+    for i in a:
+        print(*i)
     
-    def divide(in_start, in_end, p_start, p_end):
-
-        if in_start > in_end or p_start > p_end:
-            return
-        
-        rt = po_o[p_end]
-        print(rt, end='\n')
-
-        l = pos[rt] - in_start                      #rt 기준 왼쪽 자식 갯수
-        r = in_end - pos[rt]                        #rt 기준 오른쪽 자식 갯수
-
-        divide(in_start, in_start+l-1, p_start, p_start+l-1) # 왼쪽 노드 
-        divide(in_end-r+1, in_end, p_end-r, p_end-1) # 오른쪽 노드
-
-    divide(0, n-1, 0, n-1)
-
-       
-
     # ######## INPUT AREA END ############
 
 

@@ -18,34 +18,41 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    sys.setrecursionlimit(10**5)
+    # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
     n = int(input().strip())
-    in_o = list(map(int,input().split()))
-    po_o = list(map(int,input().split()))
+    l = [[] for _ in range(n+1)]
+    for _ in range(n-1):
+        a,b,c = map(int, input().split())
+        l[a].append((c, b))
+        l[b].append((c, a))
 
-    pos = [0] * (n+1)
-    for i in range(n):
-        pos[in_o[i]] = i
+    def dfs(q):
+        g = [-1] * (n+1)
+        g[q[0][1]] = q[0][0]
+        max_g = [0,0]
+        while q:
+            d, p = q.pop()
+            for nd, np in l[p]:
+                if g[np] != -1:
+                    continue
+                t = nd + d
+                g[np] = t
+                if t > max_g[0]:
+                    max_g = [t, np]
+                q.append((t, np))
+        return max_g
     
-    def divide(in_start, in_end, p_start, p_end):
+    p1 = dfs([[0, 1]])
+    p2 = dfs([[0, p1[1]]])
+    print(p2[0])
 
-        if in_start > in_end or p_start > p_end:
-            return
-        
-        rt = po_o[p_end]
-        print(rt, end='\n')
+    
 
-        l = pos[rt] - in_start                      #rt 기준 왼쪽 자식 갯수
-        r = in_end - pos[rt]                        #rt 기준 오른쪽 자식 갯수
 
-        divide(in_start, in_start+l-1, p_start, p_start+l-1) # 왼쪽 노드 
-        divide(in_end-r+1, in_end, p_end-r, p_end-1) # 오른쪽 노드
 
-    divide(0, n-1, 0, n-1)
 
-       
 
     # ######## INPUT AREA END ############
 

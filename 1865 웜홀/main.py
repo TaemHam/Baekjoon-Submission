@@ -18,34 +18,39 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    sys.setrecursionlimit(10**5)
+    # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    in_o = list(map(int,input().split()))
-    po_o = list(map(int,input().split()))
+    inf= int(1e9)
+    tc = int(input().strip())
+    for _ in range(tc):
+        n, m, w= map(int, input().split())
+        grp = [[] for _ in range(n+1)]
+        for _ in range(m):
+            s, e, t= map(int, input().split())
+            grp[s].append((e,t))
+            grp[e].append((s,t))
+        for _ in range(w):
+            s, e, t= map(int, input().split())
+            grp[s].append((e,-t))
+        tbl = [inf] * (n+1)
+        tbl[1] = 0
 
-    pos = [0] * (n+1)
-    for i in range(n):
-        pos[in_o[i]] = i
-    
-    def divide(in_start, in_end, p_start, p_end):
+        for i in range(1, n+1):
+            cnt = 0
+            for p in range(1,n+1):
+                d = tbl[p]
+                for np, nd in grp[p]:
+                    td = nd + d
+                    if td < tbl[np]:
+                        tbl[np] = td
+                        cnt += 1
+            if cnt == 0:
+                print('NO')
+                break
+            elif i == n:
+                print('YES')
 
-        if in_start > in_end or p_start > p_end:
-            return
-        
-        rt = po_o[p_end]
-        print(rt, end='\n')
-
-        l = pos[rt] - in_start                      #rt 기준 왼쪽 자식 갯수
-        r = in_end - pos[rt]                        #rt 기준 오른쪽 자식 갯수
-
-        divide(in_start, in_start+l-1, p_start, p_start+l-1) # 왼쪽 노드 
-        divide(in_end-r+1, in_end, p_end-r, p_end-1) # 오른쪽 노드
-
-    divide(0, n-1, 0, n-1)
-
-       
 
     # ######## INPUT AREA END ############
 
