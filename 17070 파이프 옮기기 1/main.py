@@ -22,34 +22,39 @@ def main(f=None):
     # ######## INPUT AREA BEGIN ##########
 
     n = int(input().strip())
-    grp = []
+    mat = []
     for _ in range(n):
-        grp.append(input().strip())
+        mat.append(input().split())
 
-    global ans
-    ans = ''
+    dy = [0, 1, 1]              # 0은 가로, 1은 대각선, 2는 세로
+    dx = [1, 1, 0]
+    q = [(0, 1, 0)]
+    cnt = 0
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
+    while q:
+        y, x, d = q.pop()
+
+        if d == 0:
+            l, r = 0, 2
+        elif d == 1:
+            l, r = 0, 3
         else:
-            ans += pick
-            return
-    
-    check(0,0,n)
-    print(ans)
-    
+            l, r = 1, 3
+
+        for i in range(l, r):
+            ny = y + dy[i]
+            nx = x + dx[i]
+            if 0 <= ny < n and 0 <= nx < n and mat[ny][nx] == '0':
+                if i == 1:
+                    if mat[ny-1][nx] == '1' or mat[ny][nx-1] == '1':
+                        continue
+                if ny == nx == n-1:
+                    cnt += 1
+                    continue
+                q.append((ny, nx, i))
+
+    print(cnt)
+
 
     # ######## INPUT AREA END ############
 

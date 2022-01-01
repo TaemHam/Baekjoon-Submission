@@ -21,35 +21,24 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
+    inf = int(1e6)
     n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
-
-    global ans
-    ans = ''
-
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
-    
-    check(0,0,n)
-    print(ans)
-    
+    max_grp = list(map(int, input().split()))
+    min_grp = max_grp[:]
+    for y in range(n-1):
+        l = list(map(int, input().split()))
+        max_dp = [0] * 3
+        min_dp = [inf] * 3
+        for x in range(3):
+            for d in [-1, 0, 1]:
+                px = x + d
+                if 0 <= px < 3:
+                    max_dp[x] = max(max_dp[x], l[x] + max_grp[px])
+                    min_dp[x] = min(min_dp[x], l[x] + min_grp[px])
+        max_grp = max_dp[:]
+        min_grp = min_dp[:]
+    print(max(max_grp))
+    print(min(min_grp))
 
     # ######## INPUT AREA END ############
 

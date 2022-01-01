@@ -21,35 +21,33 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
-
-    global ans
-    ans = ''
-
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
+    inf = int(1e9)
+    n, m, r= map(int, input().split())
+    l = list(map(int, input().split()))
+    grp = [[inf] * n for _ in range(n)]
+    for i in range(n):
+        grp[i][i] = 0
+    for _ in range(r):
+        n1, n2, c = map(int, input().split())
+        if c <= m:
+            grp[n1-1][n2-1] = c
+            grp[n2-1][n1-1] = c
     
-    check(0,0,n)
-    print(ans)
+    for mid in range(n):
+        for stt in range(n):
+            for end in range(n):
+                nc= grp[stt][mid] + grp[mid][end]
+                if grp[stt][end] > nc and nc <= m:
+                    grp[stt][end] = nc
     
+    li = [0] * n
+    for i in range(n):
+        for j in range(n):
+            if grp[i][j] != inf:
+                li[i] += l[j]
+                
+    print(max(li))
+
 
     # ######## INPUT AREA END ############
 

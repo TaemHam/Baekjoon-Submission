@@ -10,7 +10,7 @@ import sys
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
 DEBUG = False
@@ -21,35 +21,34 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
+    inf = int(1e9)
     n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
+    m = int(input().strip())
+    grp = [[] for _ in range(n+1)]
+    for _ in range(m):
+        s, e, t = map(int, input().split())
+        grp[s].append((t, e))
+    tbl = [inf] * (n+1)
 
-    global ans
-    ans = ''
+    s, e = map(int, input().split())
+    tbl[s] = 0
+    q = [(0, s)]
+    rt = [[s] for _ in range(n+1)]
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
-    
-    check(0,0,n)
-    print(ans)
-    
+    while q:
+        d, p = heappop(q)
+        if tbl[p] < d:
+            continue
+        for nd, np in grp[p]:
+            td = nd + d
+            if td < tbl[np]:
+                tbl[np] = td
+                rt[np] = rt[p] + [np]
+                heappush(q, (td, np))
+
+    print(tbl[e])
+    print(len(rt[e]))
+    print(*rt[e])
 
     # ######## INPUT AREA END ############
 

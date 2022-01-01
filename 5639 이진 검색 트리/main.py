@@ -21,35 +21,35 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
-
+    m = []
+    try:
+        while True:
+            m.append(int(input().strip()))
+    except:
+        pass
     global ans
-    ans = ''
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
+    def divide(l, r):
+        if l == r:
             return
+        root = m[l]
+        nl, nr = l+1, l+1
+        while nr != r:
+            if m[nr] > root:
+                break
+            nr += 1
+        else:
+            divide(nl, nr)
+            print(root)
+            return
+        divide(nl, nr)
+        divide(nr, r)
+        print(root)
     
-    check(0,0,n)
-    print(ans)
-    
+    divide(0, len(m))
+            
+
+
 
     # ######## INPUT AREA END ############
 

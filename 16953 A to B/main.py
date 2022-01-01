@@ -20,36 +20,29 @@ def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
+    n, m= map(int, input().split())
+    if n == m:
+        print(1)
+        return
+    q = [(n, 1)]
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
-
-    global ans
-    ans = ''
-
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
+    while q:
+        t, c = q.pop()
+        if 2*t < m:
+            q.append((2*t, c+1))
+        elif 2*t == m:
+            print(c+1)
             return
-    
-    check(0,0,n)
-    print(ans)
-    
+        t1 = int(str(t) + '1')
+        if t1 < m:
+            q.append((t1, c+1))
+        elif t1 == m:
+            print(c+1)
+            return
+    print(-1)
+
+
+
 
     # ######## INPUT AREA END ############
 

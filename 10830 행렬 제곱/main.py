@@ -21,35 +21,40 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
+    n, m = map(int,input().split())
+    l = []
     for _ in range(n):
-        grp.append(input().strip())
+        l.append(list(map(int, input().split())))
 
-    global ans
-    ans = ''
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
+    def sqr(mat_a, mat_b):
+        n_mat = [[0] * n for _ in range(n)]
+        for y in range(n):
+            for x in range(n):
+                for i in range(n):
+                    n_mat[y][x] += mat_a[y][i] * mat_b[i][x] 
+                n_mat[y][x] %= 1000
+        return n_mat
+
+
+    def sol(num):
+        if num == 1:
+            return l
+
+        temp_mat = sol(num//2)
+
+        mat = sqr(temp_mat, temp_mat)
+
+        if num % 2:
+            return sqr(mat, l)
         else:
-            ans += pick
-            return
+            return mat
     
-    check(0,0,n)
-    print(ans)
-    
+    ans = sol(m)
+    for y in ans:
+        for x in y:
+            print(x%1000, end= ' ')
+        print()
 
     # ######## INPUT AREA END ############
 

@@ -8,7 +8,7 @@ import sys
 #import collections
 #from collections import deque
 #from collections import Counter, defaultdict as dd
-#import math
+import math
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
@@ -21,35 +21,38 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
+    mod = 1000000007
+    n = int(input())
 
-    global ans
-    ans = ''
+    def sqr(n, s):
+        if s == 1:
+            return n
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
+        if s % 2 == 0:
+            t = sqr(n, s//2)
+            return t * t % mod
+
         else:
-            ans += pick
-            return
-    
-    check(0,0,n)
+            return n * sqr(n, s-1) % mod
+
+    def exp(n, s):
+        return s * sqr(n, mod-2) % mod
+
+
+    ans = 0
+
+    for _ in range(n):
+        n, s = map(int, input().split())
+
+        g = math.gcd(n, s)
+        n //= g
+        s //= g
+
+        ans += exp(n, s)
+        ans %= mod
+
     print(ans)
-    
+
 
     # ######## INPUT AREA END ############
 

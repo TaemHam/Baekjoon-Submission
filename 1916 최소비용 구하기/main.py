@@ -10,7 +10,7 @@ import sys
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
 DEBUG = False
@@ -22,35 +22,30 @@ def main(f=None):
     # ######## INPUT AREA BEGIN ##########
 
     n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
+    m = int(input().strip())
+    grp = [[] for _ in range(n+1)]
+    for _ in range(m):
+        s, e, t= map(int,input().split())
+        grp[s].append((t, e))
 
-    global ans
-    ans = ''
+    inf = int(1e9)
+    l = [inf] * (n+1)
+    s, e = map(int, input().split())
+    l[s] = 0
+    q = [(0, s)]
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
+    while q:
+        d, p = heappop(q)
+        if l[p] < d:
+            continue
+        for nd, np in grp[p]:
+            td = d + nd
+            if l[np] > td:
+                l[np] = td
+                heappush(q, (td, np))
+
+    print(l[e])
     
-    check(0,0,n)
-    print(ans)
-    
-
     # ######## INPUT AREA END ############
 
 

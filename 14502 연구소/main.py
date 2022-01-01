@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-#from collections import deque
+from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,35 +21,59 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
+    inf = 65
+    n, m = map(int, input().split())
+    mat = []
+    zloc = []
+    vloc = []
+    for y in range(n):
+        t = list(input().split())
+        for x in range(m):
+            if t[x] == '0':
+                zloc.append((y,x))
+            elif t[x] == '2':
+                vloc.append((y,x))
+        mat.append(t)
+    zcnt = len(zloc)
+    min_vcnt= inf
 
-    global ans
-    ans = ''
+    dy = [1, -1, 0, 0]
+    dx = [0, 0, 1, -1]
+    def spread_virus(min_v):
+        vcnt = len(vloc)
+        v = [[True] * m for _ in range(n)]
+        q = deque(vloc)
+        while q:
+            y, x = q.popleft()
+            v[y][x] = False
+            for i in range(4):
+                ny = y + dy[i]
+                nx = x + dx[i]
+                if 0<=ny<n and 0<=nx<m and mat[ny][nx] == '0' and v[ny][nx] == True:
+                    v[ny][nx] = False
+                    q.append((ny, nx))
+                    vcnt += 1
+            if vcnt >= min_v:
+                return inf
+        return min(min_v, vcnt)
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
+
+    for a in range(zcnt):
+        ay, ax = zloc[a]
+        mat[ay][ax] = '1'
+        for b in range(a+1, zcnt):
+            by, bx = zloc[b]
+            mat[by][bx] = '1'
+            for c in range(b+1, zcnt):
+                cy, cx = zloc[c]
+                mat[cy][cx] = '1'
+                min_vcnt= min(spread_virus(min_vcnt), min_vcnt)
+                mat[cy][cx] = '0'
+            mat[by][bx] = '0'
+        mat[ay][ax] = '0'
     
-    check(0,0,n)
-    print(ans)
-    
+    print(zcnt - min_vcnt - 3 + len(vloc))
+
 
     # ######## INPUT AREA END ############
 

@@ -10,7 +10,7 @@ import sys
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
 DEBUG = False
@@ -21,35 +21,39 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
+    inf = int(1e9)
+    n, m = map(int, input().split())
+    grp = [[] for _ in range(n+1)]
+    for i in range(m):
+        s, e, t = map(int, input().split())
+        grp[s].append((t, e))
+        grp[e].append((t, s))
+    v1, v2 = map(int, input().split())
 
-    global ans
-    ans = ''
+    def djk (q):
+        l = [inf] * (n+1)
+        l[q[0][1]] = 0
+        while q:
+            d, p = heappop(q)
+            if l[p] > d:
+                continue
+            for nd, np in grp[p]:
+                td = d + nd
+                if td < l[np]:
+                    l[np] = td
+                    heappush(q, (td, np))
+        return l
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
+    ls = djk([(0, 1)])
+    le = djk([(0, n)])
+    rm = djk([(0, v1)])[v2]
+    if inf in [ls[v1], le[v2], ls[v2], ls[v1], rm]:
+        print(-1)
+        return
     
-    check(0,0,n)
-    print(ans)
-    
+    route1 = ls[v1] + rm + le[v2]
+    route2 = ls[v2] + rm + le[v1]
+    print(min(route1, route2))
 
     # ######## INPUT AREA END ############
 

@@ -10,7 +10,7 @@ import sys
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
 DEBUG = False
@@ -21,35 +21,47 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    grp = []
-    for _ in range(n):
-        grp.append(input().strip())
+    inf = int(1e9)
+    n, m, x = map(int, input().split())
+    go_grp = [[] for _ in range(n+1)]
+    cm_grp = [[] for _ in range(n+1)]
 
-    global ans
-    ans = ''
+    for _ in range(m):
+        s, e, t = map(int, input().split())
+        go_grp[e].append((t, s))
+        cm_grp[s].append((t, e))
+    go_tbl = [inf] * (n+1)
+    cm_tbl = [inf] * (n+1)
+    go_tbl[x] = 0
+    cm_tbl[x] = 0
+    gq = [(0, x)]
+    cq = [(0, x)]
 
-    def check(x, y, n):
-        global ans
-        pick = grp[y][x]
-        for i in range(y, y+n):
-            for j in range(x, x+n):
-                if grp[i][j] != pick:
-                    nn = n//2
-                    ans += '('
-                    check(x, y, nn)
-                    check(x+nn, y, nn)
-                    check(x, y+nn, nn)
-                    check(x+nn, y+nn, nn)
-                    ans += ')'
-                    return
-        else:
-            ans += pick
-            return
+    while gq:
+        d, p = heappop(gq)
+        if go_tbl[p] > d:
+            continue
+        for nd, np in go_grp[p]:
+            td = d + nd
+            if td < go_tbl[np]:
+                go_tbl[np] = td
+                heappush(gq, (td, np))
     
-    check(0,0,n)
+    while cq:
+        d, p = heappop(cq)
+        if cm_tbl[p] < d:
+            continue
+        for nd, np in cm_grp[p]:
+            td = d + nd
+            if td < cm_tbl[np]:
+                cm_tbl[np] = td
+                heappush(cq, (td, np))
+    
+    ans = 0
+    for i in range(1, n+1):
+        ans = max(go_tbl[i] + cm_tbl[i], ans)
+    
     print(ans)
-    
 
     # ######## INPUT AREA END ############
 
