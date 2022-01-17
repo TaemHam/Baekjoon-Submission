@@ -30,7 +30,7 @@ def main(f=None):
     ans = dst(grp[0], grp[1])                                               # answer에 처음 두 좌표 거리 초기화
 
     for i in range(2, n):
-        d = pow(ans, 0.5)                                                   # 지금까지 스캔 한 좌표 중 가장 짧은 거리 구해서 
+        d = pow(ans, 0.5)                                                   # d에는 지금까지 스캔 한 좌표들 중 가장 짧은 거리를 넣어줌
         b = bisl(grp, grp[i][0] - d, key = lambda x: x[0])                  # x좌표 상에서 거리 d안에 있는 모든 점들 candidate로 걸러줌 
         cnd = grp[b:i]
 
