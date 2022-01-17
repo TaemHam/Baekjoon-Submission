@@ -21,33 +21,33 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def dst(a, b):
+    def dst(a, b):                                                          # 좌표 a와 좌표 b 거리 구하는 용도
         return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
 
     n = int(input().strip())
-    grp = [list(map(float, input().split())) for _ in range(n)]
-    grp.sort()
-    ans = dst(grp[0], grp[1])
+    grp = [list(map(int, input().split())) for _ in range(n)]               
+    grp.sort()                                                              # 이분탐색 위해 sort
+    ans = dst(grp[0], grp[1])                                               # answer에 처음 두 좌표 거리 초기화
 
     for i in range(2, n):
-        d = pow(ans, 0.5)
-        b = bisl(grp, grp[i][0] - d, key = lambda x: x[0])
+        d = pow(ans, 0.5)                                                   # 지금까지 스캔 한 좌표 중 가장 짧은 거리 구해서 
+        b = bisl(grp, grp[i][0] - d, key = lambda x: x[0])                  # x좌표 상에서 거리 d안에 있는 모든 점들 candidate로 걸러줌 
         cnd = grp[b:i]
 
-        cnd.sort(key= lambda x: x[1])
+        cnd.sort(key= lambda x: x[1])                                       # y좌표로 이분탐색 위해 y좌표로 sort
         lb = bisl(cnd, grp[i][1] - d, key = lambda x: x[1])
         ub = bisr(cnd, grp[i][1] + d, key = lambda x: x[1])
-        cnd = cnd[lb:ub]
+        cnd = cnd[lb:ub]                                                    # y좌표 상에서 거리 d 안에 있는 점들 2차로 걸러줌
 
         for pnt in cnd:
-            tmp = dst(grp[i], pnt)
-            if ans > tmp:
+            tmp = dst(grp[i], pnt)                                          # 걸러진 candidate 들을 현재 스캔중인 좌표와 비교해
+            if ans > tmp:                                                   # answer 갱신
                 ans = tmp
 
-        if ans == 0:
+        if ans == 0:                                                        # 좌표가 겹칠 경우가 존재하므로 거리가 0이 나오면 스킵
             break
     
-    print(int(ans))
+    print(ans)
 
     # ######## INPUT AREA END ############
 
