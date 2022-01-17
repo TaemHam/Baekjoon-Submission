@@ -21,37 +21,38 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    grp = [list(map(int, list(input().strip()))) for _ in range(9)]
 
-        if q in brd:
-            return
+    def solve(y):
+        for ny in range(y, 9):
+            for nx in range(9):
+                if grp[ny][nx] != 0:
+                    continue
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+                for num in range(1, 10):
+                    row = [grp[ny][i] for i in range(9)]
+                    if num in row:
+                        continue
+                    col = [grp[i][nx] for i in range(9)]
+                    if num in col:
+                        continue
+                    sqr = [grp[ny//3*3 + i][nx//3*3 + j] for i in range (3) for j in range(3)]
+                    if num in sqr:
+                        continue
+                    grp[ny][nx] = num
+                    if solve(ny):
+                        return 1
+                else:
+                    grp[ny][nx] = 0
+                    return 0
+        else:
+            return 1
 
-        brd.append(q)
+    solve(0)
+    for i in grp:
+        print(*i, sep='')
 
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
 
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +87,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

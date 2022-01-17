@@ -21,37 +21,32 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
-
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
     n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
+    mod = 1000000007
+    dp_o = (
+        [0, 1, 1, 0, 0, 0, 0, 0],
+        [1, 0, 1, 1, 0, 0, 0, 0],
+        [1, 1, 0, 1, 1, 0, 0, 0],
+        [0, 1, 1, 0, 1, 1, 0, 0],
+        [0, 0, 1, 1, 0, 1, 1, 0],
+        [0, 0, 0, 1, 1, 0, 0, 1],
+        [0, 0, 0, 0, 1, 0, 0, 1],
+        [0, 0, 0, 0, 0, 1, 1, 0]
+    )
+    dp_a = [[0] * 8 for _ in range(8)]
+    for i in range(8):
+        dp_a[i][i] = 1
+    
+    while n > 0:
+        if n % 2 != 0:
+            dp_a = [[sum(dp_a[i][k] * dp_o[k][j] % mod for k in range(8)) % mod for j in range(8)] for i in range(8)]
+            n -= 1
+        
+        dp_o = [[sum(dp_o[i][k] * dp_o[k][j] % mod for k in range(8)) % mod for j in range(8)] for i in range(8)]
+        n //= 2
+    
+    print(dp_a[0][0])
+    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +81,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

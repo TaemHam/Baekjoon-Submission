@@ -10,7 +10,7 @@ import sys
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
 DEBUG = False
@@ -21,37 +21,25 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    n, k = map(int, input().split())
+    l = [list(map(int, input().split())) for _ in range(n)]
+    bag = [int(input().strip()) for _ in range(k)]
+    l.sort()
+    bag.sort()
 
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
     ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
+    q = []
+    for i in bag:
+        while l and i >= l[0][0]:
+            _, v = heappop(l)
+            heappush(q, -v)
+        
+        if q:
+            ans += heappop(q)
+        elif not l:
+            break
+    
+    print(-ans)
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +74,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

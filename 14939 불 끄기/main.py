@@ -1,6 +1,7 @@
 # CP template Version 1.006
 import os
 import sys
+from copy import deepcopy
 #import string
 #from functools import cmp_to_key, reduce, partial
 #import itertools
@@ -20,38 +21,58 @@ def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
-
-    def nq(brd, q):
-        global ans
-
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
     global ans
-    n = int(input().strip())
-    ans = 0
+    inf = int(1e9)
+    arr = []
+    ans = inf
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    for _ in range(10):
+        t = input().strip()
+        v = 0
+        for i in range(10):
+            if t[i] == 'O':
+                v = v | (1<<i)
+        arr.append(v)
 
-    print(ans)
-                
-                    
+    dy = [1, -1, 0, 0, 0]
+    dx = [0, 0, 0, 1, -1]
+
+    def press(y, x, g, c):
+        c += 1
+        for i in range(5):
+            ny = y + dy[i]
+            nx = x + dx[i]
+            if 0 <= ny < 10 and 0 <= nx < 10:
+                g[ny] = g[ny] ^ (1<<nx)
+        return g, c
+
+    
+    def solve(g, c):
+        global ans
+        for y in range(1, 10):
+            for x in range(10):
+                if g[y-1] & (1 << x):
+                    g, c = press(y, x, g, c)
+        else:
+            if g[9] == 0:
+                ans = min(ans, c)
+
+
+    def ini(grp, cnt, p):
+        n_grp = deepcopy(grp)
+        n_grp, n_cnt = press(0, p, n_grp, cnt)
+        p += 1
+        if p < 10:
+            ini(grp, cnt, p)
+            ini(n_grp, n_cnt, p)
+        else:  
+            solve(grp, cnt)
+            solve(n_grp, n_cnt)
+
+    ini(arr, 0, 0)
+    print(ans if ans != inf else -1)
+
+
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +107,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

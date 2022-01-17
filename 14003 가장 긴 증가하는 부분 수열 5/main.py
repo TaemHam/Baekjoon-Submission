@@ -1,5 +1,6 @@
 # CP template Version 1.006
 import os
+import io
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
@@ -12,7 +13,7 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+from bisect import bisect_left as bl
 DEBUG = False
 
 
@@ -21,37 +22,31 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    input()
+    l = list(map(int, input().split()))
+    a, b = [], []
+    for i in l:
+        if not a or i > a[-1]:
+            a.append(i)
+            b.append((len(a)-1, i))
+        else:
+            p = bl(a, i)
+            a[p] = i
+            b.append((p, i))
+            
+    ans = []
+    p = len(a)-1
+    for i in range(len(b)-1, -1, -1):
+        if b[i][0] == p:
+            p -= 1
+            ans.append(b[i][1])
+    
+    print(len(ans))
+    for i in range(len(ans)-1, -1, -1):
+        print(ans[i], end= ' ')
+        
 
-        if q in brd:
-            return
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +81,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

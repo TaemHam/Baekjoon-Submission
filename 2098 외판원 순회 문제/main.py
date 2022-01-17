@@ -21,37 +21,31 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
-
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
     n = int(input().strip())
-    ans = 0
+    last = 1<<n
+    inf = int(1e9)
+    ans = inf
+    grp = [list(map(int, input().split())) for _ in range(n)]
+    dp = [[inf] * (last) for _ in range(n)]
+    dp[0][1] = 0
+    q = [(0, 1)]
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    while q:
+        c, v = q.pop()
+
+        if v == last - 1:                                                 # 모든 도시를 방문 한 경우,
+            if grp[c][0]:                                                 # 현재 도시에서 0번 도시로 가는 길이 있다면,
+                ans = min(ans, grp[c][0] + dp[c][v])                      # 가장 적은 비용 저장
+            continue
+
+        for i in range(1, n):
+            if v & (1<<i) or not grp[c][i]:                               # i번째 도시를 방문 했거나, i번째 도시로 가는 길이 없는 경우는 스킵
+                continue
+            if grp[c][i] + dp[c][v] < dp[i][v|(1<<i)]:
+                dp[i][v|(1<<i)] = grp[c][i] + dp[c][v]
+                q.append((i, v|(1<<i)))
 
     print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +80,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

@@ -4,7 +4,7 @@ import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
 #import itertools
-#from itertools import product
+from itertools import combinations
 #import collections
 #from collections import deque
 #from collections import Counter, defaultdict as dd
@@ -21,37 +21,30 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    def min_vec(l):
+        x_n, y_n = x_t, y_t
+        for x, y in l:
+            x_n -= 2*x
+            y_n -= 2*y
+        return x_n ** 2 + y_n ** 2
 
-        if q in brd:
-            return
+    tc = int(input().strip())
+    for _ in range(tc):
+        n = int(input().strip())
+        crd = []
+        x_t, y_t = (-int(i) for i in input().split())
+        for _ in range(n-1):
+            x, y = map(int, input().split())
+            x_t += x
+            y_t += y
+            crd.append((x, y))
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+        ans = int(8e10)
 
-        brd.append(q)
+        for i in combinations(crd, n//2-1):
+            ans = min(ans, min_vec(i))
+        print(pow(ans, 0.5))
 
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +79,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

@@ -12,7 +12,7 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+from bisect import bisect_left as bisl, bisect_right as bisr
 DEBUG = False
 
 
@@ -21,37 +21,33 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    def dst(a, b):
+        return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
 
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
     n = int(input().strip())
-    ans = 0
+    grp = [list(map(float, input().split())) for _ in range(n)]
+    grp.sort()
+    ans = dst(grp[0], grp[1])
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    for i in range(2, n):
+        d = pow(ans, 0.5)
+        b = bisl(grp, grp[i][0] - d, key = lambda x: x[0])
+        cnd = grp[b:i]
 
-    print(ans)
-                
-                    
+        cnd.sort(key= lambda x: x[1])
+        lb = bisl(cnd, grp[i][1] - d, key = lambda x: x[1])
+        ub = bisr(cnd, grp[i][1] + d, key = lambda x: x[1])
+        cnd = cnd[lb:ub]
+
+        for pnt in cnd:
+            tmp = dst(grp[i], pnt)
+            if ans > tmp:
+                ans = tmp
+
+        if ans == 0:
+            break
+    
+    print(int(ans))
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +82,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

@@ -4,7 +4,7 @@ import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
 #import itertools
-#from itertools import product
+from itertools import combinations
 #import collections
 #from collections import deque
 #from collections import Counter, defaultdict as dd
@@ -21,37 +21,50 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    n, s= map(int, input().split())
+    arr= list(map(int, input().split()))
+    ar1, ar2= arr[:n//2], arr[n//2:]
+    sa1, sa2= [], []
 
-        if q in brd:
-            return
+    for i in range(len(ar1)+1):
+        t = combinations(ar1, i)
+        for j in t:
+            sa1.append(sum(j))
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+    for i in range(len(ar2)+1):
+        t = combinations(ar2, i)
+        for j in t:
+            sa2.append(sum(j))
 
-        brd.append(q)
+    sa1.sort()
+    sa2.sort(reverse= True)
 
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
+    p1, p2 = 0, 0
     ans = 0
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    while p1 < len(sa1) and p2 < len(sa2):
+        t = sa1[p1] + sa2[p2]
+        if t == s:
+            c1 = 1
+            c2 = 1
+            p1 += 1
+            p2 += 1
+            while p1 < len(sa1) and sa1[p1-1] == sa1[p1]:
+                c1 += 1
+                p1 += 1
+            while p2 < len(sa2) and sa2[p2-1] == sa2[p2]:
+                c2 += 1
+                p2 += 1
+            ans += c1 * c2
+        elif t < s:
+            p1 += 1
+        else:
+            p2 += 1
 
+    if s == 0:
+        ans -= 1
     print(ans)
-                
-                    
+
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +99,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

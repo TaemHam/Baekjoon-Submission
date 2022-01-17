@@ -21,37 +21,41 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    def mul(a, b):
+        return [[sum(a[i][k] * b[k][j] for k in range(L)) % MOD for j in range(L)] for i in range(L)]
 
-        if q in brd:
-            return
+    N, S, E, T = map(int, input().split())
+    L = 5*N
+    S -= 1
+    E -= 1
+    MOD = 1000003
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+    grp = [[0] * (L) for _ in range(L)]
+    grp_a = [[0] * (L) for _ in range(L)]
+    for i in range(L):
+        grp_a[i][i] = 1
 
-        brd.append(q)
+    for y in range(N):
+        for x in range(1, 5):
+            grp[y*5+x][y*5+x-1] = 1
+    
+    for y in range(N):
+        l = list(map(int, list(input().strip())))
+        for x in range(N):
+            if l[x] == 1:
+                grp[y*5][x*5] = 1
+            elif l[x] > 1:
+                grp[y*5][x*5 + l[x]-1] = 1
+    
+    while T:
+        if T % 2:
+            grp_a = mul(grp_a, grp)
+            T -= 1
+        grp = mul(grp, grp)
+        T //= 2
+    
 
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
+    print(grp_a[S*5][E*5])
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +90,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

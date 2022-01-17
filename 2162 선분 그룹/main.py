@@ -21,37 +21,54 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
-
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
     n = int(input().strip())
-    ans = 0
+    arr = [list(map(float, input().split())) for _ in range(n)]
+    grp = [i for i in range(n)]
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    def ccw(a, b, c):
+        return (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
 
-    print(ans)
-                
-                    
+    def cccw(a, b, c):
+        return (b[0] - a[0]) * (c[0] - b[0]) + (b[1] - a[1]) * (c[1] - b[1])
+
+    def union(a, b):
+        a = find(a)
+        b = find(b)
+        grp[b] = a
+
+    def find(a):
+        if grp[a] != a:
+            grp[a] = find(grp[a])
+        return grp[a]
+
+    for i in range(n):
+        x1, y1, x2, y2 = arr[i]
+
+        for j in range(i+1, n):
+            x3, y3, x4, y4 = arr[j]
+
+            d12 = ccw((x1, y1), (x2, y2), (x3, y3)) * ccw((x1, y1), (x2, y2), (x4, y4))
+            d34 = ccw((x3, y3), (x4, y4), (x1, y1)) * ccw((x3, y3), (x4, y4), (x2, y2))
+
+            if d12 == 0 and d34 == 0:
+                dp1 = cccw((x1, y1), (x2, y2), (x3, y3))
+                dp2 = cccw((x1, y1), (x2, y2), (x4, y4))
+                dp3 = cccw((x1, y1), (x2, y2), (x1, y1))
+                if dp3 <= dp1 <= 0 or dp3 <= dp2 <= 0 or dp1 * dp2 < 0:
+                    union(i, j)
+
+            elif d12 <= 0 and d34 <= 0:
+                union(i, j)
+    
+    cnt = [0] * n
+    ans = set()
+    for i in range(n):
+        find(i)
+        cnt[grp[i]] += 1
+        ans.add(grp[i])
+
+    print(len(ans))
+    print(max(cnt))
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +103,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

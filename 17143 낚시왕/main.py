@@ -21,37 +21,51 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    dx = [-1, 1, 0, 0]
+    dy = [0, 0, 1, -1]
+    dd = [1, 0, 3, 2]
+    R, C, M = map(int, input().split())
 
-        if q in brd:
-            return
+    g = [[0] * C for i in range(R)]
+    for i in range(1, M + 1):
+        r, c, s, d, z = map(int, input().split())
+        g[r-1][c-1] = [s, d-1, z]
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+    def move():
+        t = [[0] * C for _ in range(R)]
+        for i in range(R):
+            for j in range(C):
+                if g[i][j] != 0:
+                    x, y, s, d, z = i, j, g[i][j][0], g[i][j][1], g[i][j][2]
+                    while s > 0:
+                        x += dx[d]
+                        y += dy[d]
+                        if 0 <= x < R and 0 <= y < C:
+                            s -= 1
+                        else:
+                            x -= dx[d]
+                            y -= dy[d]
+                            d = dd[d]
+                    if t[x][y] == 0:
+                        t[x][y] = [g[i][j][0], d, z]
+                    else:
+                        if t[x][y][2] < z:
+                            t[x][y] = [g[i][j][0], d, z]
+        return t
 
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
     ans = 0
+    for i in range(C):
+        for j in range(R):
+            if g[j][i] != 0:
+                ans += g[j][i][2]
+                g[j][i] = 0
+                break
+        g = move()
+    print(ans)               
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+        
 
-    print(ans)
-                
-                    
+
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +100,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

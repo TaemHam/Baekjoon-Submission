@@ -10,7 +10,7 @@ import sys
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
 DEBUG = False
@@ -21,37 +21,30 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    n, m = map(int, input().split())
+    ind = [0] * (n+1)
+    grp = [[] for _ in range(n+1)]
+    for _ in range(m):
+        a, b = map(int, input().split())
+        grp[a].append(b)
+        ind[b] += 1
+    
+    q = []
+    for i in range(1, n+1):
+        if not ind[i]:
+            heappush(q, i)
+    
+    ans = []
+    while q:
+        t = heappop(q)
+        ans.append(t)
+        for i in grp[t]:
+            ind[i] -= 1
+            if not ind[i]:
+                heappush(q, i)
+    
+    print(' '.join(map(str, ans)))
 
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +79,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

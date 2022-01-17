@@ -21,37 +21,39 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    S = input().strip()
+    grp = [(0, 0)]
 
-        if q in brd:
-            return
+    for i in range(len(S)):
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+        p1 = 1
+        while i - p1 >= 0 and i + p1 < len(S):
+            if S[i - p1] == S[i + p1]:
+                p1 += 1
+            else: 
+                break
 
-        brd.append(q)
+        p2 = 0
+        while i - p2 > 0 and i + p2 < len(S):
+            if S[i-1 - p2] == S[i + p2]:
+                p2 += 1
+            else:
+                break
 
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
+        grp.append((p1, p2+1))
 
-        for q in range(n):
-            nq(brd[:], q)
+    dp = [int(1e9)] * (len(S)+1)
+    dp[0] = 0
 
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
+    for i in range(1, len(dp)):
+        dp[i] = min(dp[i], dp[i-1] + 1)
+        p1, p2 = grp[i]
+        for j in range(1, p1):
+            dp[i+j] = min(dp[i+j], dp[i-j-1] + 1)
+        for j in range(1, p2):
+            dp[i+j-1] = min(dp[i+j-1], dp[i-j-1] + 1)
+    
+    print(dp[-1])
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +88,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

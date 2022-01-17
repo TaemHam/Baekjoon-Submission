@@ -21,37 +21,44 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    x1, y1, x2, y2 = map(float, input().split())
+    x3, y3, x4, y4 = map(float, input().split())
 
-        if q in brd:
-            return
+    def ccw(a, b, c):
+        t = a[0] * b[1] + b[0] * c[1] + c[0] * a[1]
+        t -= a[1] * b[0] + b[1] * c[0] + c[1] * a[0]
+        if t > 0:
+            return 1
+        elif t == 0:
+            return 0
+        else:
+            return -1
+    
+    d12 = ccw((x1, y1), (x2, y2), (x3, y3)) * ccw((x1, y1), (x2, y2), (x4, y4))
+    d34 = ccw((x3, y3), (x4, y4), (x1, y1)) * ccw((x3, y3), (x4, y4), (x2, y2))
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
+    if d12 == 0 and d34 == 0:
+        if x1 > x2:
+            x1, x2 = x2, x1
+        if x3 > x4:
+            x3, x4 = x4, x3
+        if y1 > y2:
+            y1, y2 = y2, y1
+        if y3 > y4:
+            y3, y4 = y4, y3
+        
+        if (x3 <= x1 <= x4 or x3 <= x2 <= x4 or x1 <= x3 <= x2 or x1 <= x4 <= x2) and (y3 <= y1 <= y4 or y3 <= y2 <= y4 or y1 <= y3 <= y2 or y1 <= y4 <= y2):
+            print(1)
+        else:
+            print(0)
 
-        brd.append(q)
+    else:
+        if d12 <= 0 and d34 <= 0:
+            print(1)
+        else:
+            print(0)
 
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
 
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +93,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

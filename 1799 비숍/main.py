@@ -2,7 +2,7 @@
 import os
 import sys
 #import string
-#from functools import cmp_to_key, reduce, partial
+#from bshpctools import cmp_to_key, reduce, partial
 #import itertools
 #from itertools import product
 #import collections
@@ -21,37 +21,61 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
-
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
+    
     n = int(input().strip())
-    ans = 0
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    grp = []
+    blk = []
+    wht = []
+    clr = [[0] * n for _ in range(n)]
 
-    print(ans)
-                
-                    
+    for i in range(n):
+        for j in range(n):
+            clr[i][j] = (i % 2 == 0 and j % 2 == 0) or (i % 2 != 0 and j % 2 != 0)
+
+    for i in range(n):
+        grp.append(list(map(int, input().split())))
+        for j in range(n):
+            if grp[i][j] == 1 and clr[i][j] == 1:
+                blk.append((i, j))
+            if grp[i][j] == 1 and clr[i][j] == 0:
+                wht.append((i, j))
+
+    global Bcnt, Wcnt
+    Bcnt, Wcnt = 0, 0
+
+    u1 = [0] * (n * 2 - 1)
+    u2 = [0] * (n * 2 - 1)
+
+
+    def bshp(bishop, index, count):
+        global Bcnt, Wcnt
+        if index == len(bishop):
+            rx, ry = bishop[index - 1]
+            if clr[rx][ry]:
+                Bcnt = max(Bcnt, count)
+            else:
+                Wcnt = max(Wcnt, count)
+            return
+
+        x, y = bishop[index]
+        if u1[x + y] or u2[x - y + n - 1]:
+            bshp(bishop, index + 1, count)
+        else:
+            u1[x + y] = 1
+            u2[x - y + n - 1] = 1
+            bshp(bishop, index + 1, count + 1)
+            u1[x + y] = 0
+            u2[x - y + n - 1] = 0
+            bshp(bishop, index + 1, count)
+
+    if len(blk) > 0:
+        bshp(blk, 0, 0)
+    if len(wht) > 0:
+        bshp(wht, 0, 0)
+    print(Bcnt + Wcnt)
+
+
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +110,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

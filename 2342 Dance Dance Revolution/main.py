@@ -21,37 +21,27 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
+    cmd = list(map(int, input().split()))[:-1]
+    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
+    dp= [[0] * 5 for _ in range(2)]
+    dp[1][0] = 0
+    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
+    stt, flg = 0, 0
+    for i in cmd:
+        print(i)
+        for j in range(5):
+            dp[flg][j] = dp[1-flg][j] + move[stt][i]
+        print(dp)
 
-        if q in brd:
-            return
+        for j in range(5):
+            dp[flg][stt] = min(dp[flg][stt], dp[1-flg][j] + move[j][i])
+        
+        stt = i
+        flg = 1 - flg
+        print(dp)
+    
+    print(min(dp[1 - flg]))
 
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
-    n = int(input().strip())
-    ans = 0
-
-    for q in range(n):
-        brd = []
-        nq(brd, q)
-
-    print(ans)
-                
-                    
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +76,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

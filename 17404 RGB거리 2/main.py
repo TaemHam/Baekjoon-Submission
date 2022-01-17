@@ -21,37 +21,25 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def nq(brd, q):
-        global ans
-
-        if q in brd:
-            return
-
-        for i in range(len(brd)):
-            diag = len(brd) - i
-            if q == brd[i] + diag or q == brd[i] - diag:
-                return
-
-        brd.append(q)
-
-        if len(brd) == n:          # 만약 마지막 퀸까지 배치 완료했다면
-            ans += 1
-            return
-
-        for q in range(n):
-            nq(brd[:], q)
-
-    global ans
     n = int(input().strip())
-    ans = 0
+    inf = int(1e9)
 
-    for q in range(n):
-        brd = []
-        nq(brd, q)
+    arr = [list(map(int, input().split())) for _ in range(n)]
+    ans = inf
+
+    for col in range(3):
+        dp = [[inf] * 3 for _ in range(n)]
+        dp[0][col] = arr[0][col]
+        for i in range(1, n):
+            dp[i][0] = arr[i][0] + min(dp[i-1][1], dp[i-1][2])
+            dp[i][1] = arr[i][1] + min(dp[i-1][0], dp[i-1][2])
+            dp[i][2] = arr[i][2] + min(dp[i-1][0], dp[i-1][1])
+        dp[-1][col] = inf
+
+        ans = min([ans] + dp[-1])
 
     print(ans)
-                
-                    
+
 
     # ######## INPUT AREA END ############
 
@@ -86,7 +74,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:
