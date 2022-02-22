@@ -20,28 +20,41 @@ def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
-
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
-
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
     
-    print(min(dp[1 - flg]))
+    dd = [-1, 1, -5, 5]
+    max_size = 1
+    for i in range(24, 17, -1):
+        max_size |= 1 << i
+    log = [0] * max_size
+    brd = [0] * 25
+    ans = set()
+    for y in range(0, 25, 5):
+        tmp = input().strip()
+        for x in range(5):
+            if tmp[x] == 'S':
+                brd[y+x] = 1
+    
+    for p in range(25):
+        log[p] = 1
+        q = [(1 << p, set([p]), brd[p])]
+        while q:
+            vis, arr, cnt = q.pop()
 
+            if len(arr) == 7:
+                if cnt >= 4:
+                    ans.add(vis)
+                continue
+            
+            for prv in arr:
+                for i in range(4):
+                    nxt = prv + dd[i]
+                    if 0 <= nxt < 25 and abs(nxt%5 - prv%5) != 4 and not vis & (1<<nxt):
+                        nvis = vis | (1<<nxt)
+                        if not log[nvis]:
+                            log[nvis] = 1
+                            q.append((vis | (1<<nxt), arr.union([nxt]), cnt + brd[nxt]))
+    
+    print(len(ans))
 
     # ######## INPUT AREA END ############
 

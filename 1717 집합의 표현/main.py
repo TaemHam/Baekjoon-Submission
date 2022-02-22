@@ -18,30 +18,34 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    # sys.setrecursionlimit(10**9)
+    sys.setrecursionlimit(10**5)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n, m = map(int, input().split())
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    par = list(range(n+1))
+
+    def find(x):
+        if x != par[x]:
+            par[x] = find(par[x])
+        return par[x]
+
+    def union(a, b):
+        a = find(a)
+        b = find(b)
+        if a > b:
+            a, b = b, a
+        par[b] = a
     
-    print(min(dp[1 - flg]))
-
+    for _ in range(m):
+        a, b, c = map(int, input().split())
+        if a:
+            if find(b) == find(c):
+                print('YES')
+            else:
+                print('NO')
+        else:
+            union(b, c)
 
     # ######## INPUT AREA END ############
 

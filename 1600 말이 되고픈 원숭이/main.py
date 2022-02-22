@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-#from collections import deque
+from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,26 +21,45 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    dy = [1, -1, 0, 0]
+    dx = [0, 0, 1, -1]
+    ky = [-2, -1, 1, 2, 2, 1, -1, -2]
+    kx = [1, 2, 2, 1, -1, -2, -2, -1]
+    k = int(input().strip())
+    n, m = map(int, input().split())
+    grp = [list(input().split()) for _ in range(m)]
+    q = deque([(0, 0, 0, 0)])
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    while q:
+        y, x, j, c = q.popleft()
+        if y == m-1 and x == n-1:
+            print(c)
+            break
+
+        if grp[y][x] != '0' and grp[y][x] < j:
+            continue
+
+        grp[y][x] = j
+        c += 1
+
+        if j != k:
+            for i in range(8):
+                ny = y + ky[i]
+                nx = x + kx[i]
+                if 0 <= ny < m and 0 <= nx < n and grp[ny][nx] != '1':
+                    if grp[ny][nx] == '0' or j+1 < grp[ny][nx]:
+                        grp[ny][nx] = j+1
+                        q.append((ny, nx, j+1, c))
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+        for i in range(4):
+            ny = y + dy[i]
+            nx = x + dx[i]
+            if 0 <= ny < m and 0 <= nx < n and grp[ny][nx] != '1':
+                if grp[ny][nx] == '0' or j < grp[ny][nx]:
+                    grp[ny][nx] = j
+                    q.append((ny, nx, j, c))
+    else:
+        print(-1)
 
 
     # ######## INPUT AREA END ############

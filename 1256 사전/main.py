@@ -9,7 +9,7 @@ import sys
 #from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
-#from math import log, log2, ceil, floor, gcd, sqrt
+#from math import factorial
 #from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
@@ -21,27 +21,32 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n, m, k = map(int, input().split())
+    dp = [[1] * (m+1) for _ in range(n+1)]
+    ans = ''
+    for i in range(1, n+1):
+        for j in range(1, m+1):
+            dp[i][j] = dp[i-1][j] + dp[i][j-1]
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+    if dp[n][m] < k:
+        print(-1)
+        return
 
+    while True:
+        if n == 0 or m == 0:
+            ans += 'a' * n + 'z' * m
+            break
+
+        flg = dp[n-1][m]
+        if k <= flg:
+            ans += 'a'
+            n -= 1
+        else:
+            ans += 'z'
+            m -= 1
+            k -= flg
+
+    print(ans)
 
     # ######## INPUT AREA END ############
 

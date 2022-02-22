@@ -21,27 +21,43 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    N, L = map(int, input().split())
+    grp = [list(map(int, input().split())) for _ in range(N)]
+    ans = 0
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    vis = [[0] * N for _ in range(N)]
+    for y in range(N):
+        for x in range(1, N):
+            if abs(grp[y][x-1] - grp[y][x]) > 1:
+                break
+            if grp[y][x-1] < grp[y][x]:
+                if x-L < 0 or len(set(grp[y][x-i] for i in range(1, L+1))) > 1 or sum(vis[y][x-L:x]) > 0:
+                    break
+                vis[y][x-L:x] = [1] * L
+            elif grp[y][x-1] > grp[y][x]:
+                if x+L > N or len(set(grp[y][x+i] for i in range(L))) > 1 or sum(vis[y][x:x+L]) > 0:
+                    break
+                vis[y][x:x+L] = [1] * L
+        else:
+            ans += 1
     
-    print(min(dp[1 - flg]))
+    vis = [[0] * N for _ in range(N)]
+    for x in range(N):
+        for y in range(1, N):
+            if abs(grp[y-1][x] - grp[y][x]) > 1:
+                break
+            if grp[y-1][x] < grp[y][x]:
+                if y-L < 0 or len(set(grp[y-i][x] for i in range(1, L+1))) > 1 or sum(vis[x][y-L:y]) > 0:
+                    break
+                vis[x][y-L:y] = [1] * L
+            elif grp[y-1][x] > grp[y][x]:
+                if y+L > N or len(set(grp[y+i][x] for i in range(L))) > 1 or sum(vis[x][y:y+L]) > 0:
+                    break
+                vis[x][y:y+L] = [1] * L
+        else:
+            ans += 1
 
+    print(ans)
 
     # ######## INPUT AREA END ############
 

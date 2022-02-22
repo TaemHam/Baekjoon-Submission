@@ -21,26 +21,35 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    N, M = map(int, input().split())
+    n, m = N-1, M-1
+    dy = [0, 1, 0, -1]
+    dx = [1, 0, -1, 0]
+    grp = [list(map(int, input().split())) for _ in range(N)]
+    dp = [[-1] * M for _ in range(N)]
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    def dfs(y, x):
+
+        if y == n and x == m:
+            return 1
+
+        if dp[y][x] != -1:
+            return dp[y][x]
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+        dp[y][x] = 0
+
+        for i in range(4):
+            ny = y + dy[i]
+            nx = x + dx[i]
+
+            if 0 <= ny < N and 0 <= nx < M and grp[ny][nx] < grp[y][x]:
+                dp[y][x] += dfs(ny, nx)
+
+        return dp[y][x]
     
-    print(min(dp[1 - flg]))
+    print(dfs(0, 0))
+
+
 
 
     # ######## INPUT AREA END ############

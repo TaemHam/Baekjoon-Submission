@@ -21,28 +21,52 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n = int(input().strip())
+    grp = [[] for _ in range(n+1)]
+    par = [[0] * (n+1)]
+    dep = [0] * (n+1)
+    dep[1] = 1
+    q = [1]
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    for _ in range(n-1):
+        a, b = map(int, input().split())
+        grp[a].append(b)
+        grp[b].append(a)
     
-    print(min(dp[1 - flg]))
+    while q:
+        p = q.pop()
+        for i in grp[p]:
+            if not dep[i]:
+                par[0][i] = p
+                dep[i] = dep[p] + 1
+                q.append(i)
+    
+    max_dep = len(format(max(dep), 'b')) - 1
 
+    for i in range(1, max_dep+1):
+        tmp = [0] * (n+1)
+        for j in range(1, n+1):
+            tmp[j] = par[i-1][par[i-1][j]]
+        par.append(tmp)
+    
+    for _ in range(int(input().strip())):
+        a, b = map(int, input().split())
+        if dep[a] > dep[b]:
+            a, b = b, a
 
+        for i in range(max_dep, -1, -1):
+            if dep[b] - dep[a] >= 2**i:
+                b = par[i][b]
+        
+        if a != b:
+            for i in range(max_dep, -1, -1):
+                if par[i][a] != par[i][b]:
+                    a = par[i][a]
+                    b = par[i][b]
+            a = par[0][a]
+
+        print(a)
+        
     # ######## INPUT AREA END ############
 
 

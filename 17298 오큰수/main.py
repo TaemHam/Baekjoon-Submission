@@ -21,27 +21,21 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n = int(input().strip())
+    arr = list(map(int, input().split()))
+    dp = [0] * n
+    stk = []
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    for i in range(n-1, -1, -1):
+        while stk and arr[i] >= stk[-1]:
+            stk.pop()
+
+        if stk:
+            dp[i] = stk[-1]
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+        stk.append(arr[i])
     
-    print(min(dp[1 - flg]))
-
+    print(' '.join(map(str, dp)))
 
     # ######## INPUT AREA END ############
 

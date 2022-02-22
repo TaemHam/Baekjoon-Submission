@@ -12,7 +12,7 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-from bisect import bisect_left as bisl, bisect_right as bisr
+#from bisect import bisect_left as bisl, bisect_right as bisr
 DEBUG = False
 
 
@@ -21,33 +21,40 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    def dst(a, b):                                                          # 좌표 a와 좌표 b 거리 구하는 용도
+    def dst(a, b): 
         return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
 
     n = int(input().strip())
     grp = [list(map(int, input().split())) for _ in range(n)]               
-    grp.sort()                                                              # 이분탐색 위해 sort
-    ans = dst(grp[0], grp[1])                                               # answer에 처음 두 좌표 거리 초기화
+    grp.sort() 
 
-    for i in range(2, n):
-        d = pow(ans, 0.5)                                                   # d에는 지금까지 스캔 한 좌표들 중 가장 짧은 거리를 넣어줌
-        b = bisl(grp, grp[i][0] - d, key = lambda x: x[0])                  # x좌표 상에서 거리 d안에 있는 모든 점들 candidate로 걸러줌 
-        cnd = grp[b:i]
+    def solve(stt, end):
+        if end == stt:
+            return int(1e9)
 
-        cnd.sort(key= lambda x: x[1])                                       # y좌표로 이분탐색 위해 y좌표로 sort
-        lb = bisl(cnd, grp[i][1] - d, key = lambda x: x[1])
-        ub = bisr(cnd, grp[i][1] + d, key = lambda x: x[1])
-        cnd = cnd[lb:ub]                                                    # y좌표 상에서 거리 d 안에 있는 점들 2차로 걸러줌
+        if end - stt == 1:
+            return dst(grp[stt], grp[end])
 
-        for pnt in cnd:
-            tmp = dst(grp[i], pnt)                                          # 걸러진 candidate 들을 현재 스캔중인 좌표와 비교해
-            if ans > tmp:                                                   # answer 갱신
-                ans = tmp
+        mid = (stt + end) // 2
+        ans = min(solve(stt, mid), solve(mid, end))
 
-        if ans == 0:                                                        # 좌표가 겹칠 경우가 존재하므로 거리가 0이 나오면 스킵
-            break
+        cnd = []
+        for i in range(stt, end+1):
+            if (grp[mid][0] - grp[i][0]) ** 2 < ans:
+                cnd.append(grp[i])
+
+        cnd.sort(key= lambda x: x[1]) 
+        
+        for i in range(len(cnd) - 1):
+            for j in range(i+1, len(cnd)):
+                if (cnd[i][1] - cnd[j][1]) ** 2 < ans:
+                    ans = min(ans, dst(cnd[i], cnd[j]))
+                else:
+                    break
+        
+        return ans
     
-    print(ans)
+    print(solve(0, n-1))
 
     # ######## INPUT AREA END ############
 

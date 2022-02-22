@@ -21,26 +21,55 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
-
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    def ccw(a, b, c):
+        t = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+        if t > 0:
+            return 1
+        elif t == 0 :
+            return 0
+        else:
+            return -1
     
-    print(min(dp[1 - flg]))
+    def cross():
+        print(1)
+
+        a = (x4 - x3) * (y2 - y1) - (x2 - x1) * (y4 - y3)
+
+        if a:
+            x = ((x1 * y2 - y1 * x2) * (x4 - x3) - (x3 * y4 - y3 * x4) * (x2 - x1)) / a
+            y = ((x1 * y2 - y1 * x2) * (y4 - y3) - (x3 * y4 - y3 * x4) * (y2 - y1)) / a
+
+        else:
+            if (x1, y1) == (x4, y4) and (x3, y3) <= (x1, y1):
+                x, y = x1, y1
+            elif (x2, y2) == (x3, y3) and (x1, y1) <= (x3, y3):
+                x, y = x2, y2
+            else:
+                return
+                
+        print(x, y)
+
+    x1, y1, x2, y2 = map(float, input().split())
+    x3, y3, x4, y4 = map(float, input().split())
+
+    d12 = ccw((x1, y1), (x2, y2), (x3, y3)) * ccw((x1, y1), (x2, y2), (x4, y4))
+    d34 = ccw((x3, y3), (x4, y4), (x1, y1)) * ccw((x3, y3), (x4, y4), (x2, y2))
+
+    if d12 == 0 and d34 == 0:
+        if (x1, y1) > (x2, y2):
+            x1, y1, x2, y2 = x2, y2, x1, y1
+        if (x3, y3) > (x4, y4):
+            x3, y3, x4, y4 = x4, y4, x3, y3
+
+        if (x1, y1) <= (x4, y4) and (x3, y3) <= (x2, y2):
+            cross()
+            return
+
+    elif d12 <= 0 and d34 <= 0:
+        cross()
+        return
+    
+    print(0)
 
 
     # ######## INPUT AREA END ############

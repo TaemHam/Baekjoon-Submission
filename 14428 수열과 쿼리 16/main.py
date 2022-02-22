@@ -21,27 +21,48 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n = int(input().strip())
+    arr = [int(1e9)] + list(map(int, input().split()))
+    h = 2**len(format(n-1, 'b'))
+    tree = [int(1e9)] * (h*2)
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    h -= 1
+    for i in range(1, len(arr)):
+        tree[h+i] = arr[i]
     
-    print(min(dp[1 - flg]))
+    for i in range(h, 0, -1):
+        tree[i] = min(tree[2*i], tree[2*i+1])
 
+    m = int(input().strip())
+    for _ in range(m):
+        a, b, c = map(int, input().split())
+        
+        if a == 1:
+            arr[b] = c
+            b += h
+            tree[b] = c
+            while b > 1:
+                b >>= 1
+                tree[b] = min(tree[b*2], tree[b*2+1])
+
+        else:
+            r = int(1e9)
+            bt = b+h
+            ct = c+h
+            while bt <= ct:
+                if bt % 2:
+                    r = min(r, tree[bt])
+                    bt += 1
+                if not ct % 2:
+                    r = min(r, tree[ct])
+                    ct -= 1
+                bt //= 2
+                ct //= 2
+            
+            for i in range(b, c+1):
+                if arr[i] == r:
+                    print(i)
+                    break
 
     # ######## INPUT AREA END ############
 

@@ -18,30 +18,61 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    # sys.setrecursionlimit(10**9)
+    #sys.setrecursionlimit(10**5)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    T = int(input().strip())
+
+    for _ in range(T):
+        N, W = map(int, input().split())
+        E = [[] for _ in range(N)]
+        for _ in range(2):
+            t = list(map(int, input().split()))
+            for i in range(N):
+                E[i].append(t[i])
+        if N == 1:
+            print(1 if sum(E[0]) <= W else 2)
+            continue
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+        dp = [[0] * 3 for _ in range(N+1)]
+        d0 = E[0][0] + E[-1][0] <= W
+        d1 = E[0][1] + E[-1][1] <= W
+        dp[0][0] = 0 if d0 else 1
+        dp[0][1] = 0 if d1 else 1
+        dp[1][2] = min(dp[0][0] + 1, dp[0][1] + 1)
+        dp[1][2] -= 1 if d0 and d1 else 0
 
+        for i in range(1, N):
+
+            dp[i][0] = dp[i][2] + 1
+            dp[i][1] = dp[i][2] + 1
+
+            b0 = E[i][0] + E[i-1][0] <= W
+            b1 = E[i][1] + E[i-1][1] <= W
+            if b0:
+                dp[i][0] = min(dp[i][0], dp[i-1][1] + 1)
+            if b1:
+                dp[i][1] = min(dp[i][1], dp[i-1][0] + 1)
+
+            dp[i+1][2] = min(dp[i][0] + 1, dp[i][1] + 1)
+            if b0 and b1:
+                dp[i+1][2] = min(dp[i+1][2], dp[i-1][2] + 2)
+            if sum(E[i]) <= W:
+                dp[i+1][2] = min(dp[i+1][2], dp[i][2] + 1)
+        
+        if d0 and d1:
+            print(dp[N-1][2] + 2)
+        elif d0:
+            print(dp[N-1][1] + 1)
+        elif d1:
+            print(dp[N-1][0] + 1)
+        else:
+            print(dp[N][2])
+        
+        print(dp)
+
+        
 
     # ######## INPUT AREA END ############
 

@@ -1,12 +1,13 @@
 # CP template Version 1.006
 import os
+from re import L
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
 #import itertools
 #from itertools import product
 #import collections
-#from collections import deque
+from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,27 +22,46 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    sub_1 = lambda x : int(x)-1
+    neg_i = lambda x : -int(x)
+    dy = [0, 0, 1, -1] 
+    dx = [1, -1, 0, 0]
+    dc = [
+        [0, 2, 1, 1],
+        [2, 0, 1, 1],
+        [1, 1, 0, 2],
+        [1, 1, 2, 0]]
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+    N, M = map(int, input().split())
+    brd = [list(map(neg_i, input().split())) for _ in range(N)]
 
+    sy, sx, sd = map(sub_1, input().split())
+    ey, ex, ed = map(sub_1, input().split())
+    q = deque([(sy, sx, sd, 0)])
+    brd[sy][sx] = 1 << sd
+
+    while q:
+        y, x, d, c = q.popleft()
+
+        if y == ey and x == ex:
+            print(c + dc[d][ed])
+            return
+
+        ny, nx = y, x
+        for _ in range(3):
+            ny += dy[d]
+            nx += dx[d]
+            if 0 <= ny < N and 0 <= nx < M and brd[ny][nx] != -1:
+                if not brd[ny][nx] & (1 << d):
+                    brd[ny][nx] |= 1 << d
+                    q.append((ny, nx, d, c + 1))
+                continue
+            break
+
+        for i in range(4):
+            if not brd[y][x] & (1 << i):
+                brd[y][x] |= 1 << i
+                q.append((y, x, i, c + dc[d][i]))
 
     # ######## INPUT AREA END ############
 

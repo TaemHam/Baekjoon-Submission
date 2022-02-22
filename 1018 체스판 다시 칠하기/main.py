@@ -21,27 +21,41 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n, m = map(int, input().split())
+    brd = [[0]*m for _ in range(n)]                             # brd에 흰색 1, 검은색 0으로 저장
+    for y in range(n):
+        t = input().strip()
+        for x in range(m):
+            if t[x] == 'W':
+                brd[y][x] = 1
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    pick = brd[0][0]                                            # brd의 첫 칸 색을 기준으로
+    grp = [[0]*m for _ in range(n)]                             # 각각의 칸마다 색칠해야하면 1로, 놔둬도 되면 0으로 grp에 저장
+    for y in range(n):
+        flg = (y%2 - pick)%2
+        for x in range(m):
+            if brd[y][x] != flg:
+                grp[y][x] = 1
+            flg = 1 - flg
     
-    print(min(dp[1 - flg]))
+    dp1 = [[0]*m for _ in range(n-7)]                           # dp1은 세로 8칸 합 저장 용도
+    for x in range(m):
+        dp1[0][x] = sum([grp[i][x] for i in range(8)])
+        for y in range(1, n-7):
+            dp1[y][x] = dp1[y-1][x] - grp[y-1][x] + grp[y+7][x]
+    
+    dp2 = [[0]*(m-7) for _ in range(n-7)]                       # dp2에 8x8칸 합 저장
+    ans = 32
+    for y in range(len(dp1)):
+        t = sum(dp1[y][i] for i in range(8))
+        ans = min(ans, t, 64-t)                                 # 64에서 빼주는 이유는 
+        dp2[y][0] = t                                           # 다른 색으로 칠하는 경우를 고려해야 하기 때문
+        for x in range(1, m-7):
+            t = dp2[y][x-1] - dp1[y][x-1] + dp1[y][x+7]
+            ans = min(ans, t, 64-t)
+            dp2[y][x] = t
 
+    print(ans)
 
     # ######## INPUT AREA END ############
 

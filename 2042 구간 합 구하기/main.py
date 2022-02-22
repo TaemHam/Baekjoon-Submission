@@ -9,7 +9,7 @@ import sys
 #from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
-#from math import log, log2, ceil, floor, gcd, sqrt
+#from math import log2, ceil
 #from heapq import heappush, heappop
 #import bisect
 #from bisect import bisect_left as bl, bisect_right as br
@@ -18,30 +18,53 @@ DEBUG = False
 
 def main(f=None):
     init(f)
-    # sys.setrecursionlimit(10**9)
+    #sys.setrecursionlimit(10**5)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    def sgmt(stt, end, p):
+        if stt == end:
+            grp[p] = arr[stt]
+            return grp[p]
+        else:
+            mid = (stt + end) // 2
+            grp[p] = sgmt(stt, mid, p*2) + sgmt(mid + 1, end, p*2 + 1)
+            return grp[p]
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    def ssum(stt, end, p, l, r):
+        if r < stt or end < l:
+            return 0
+            
+        if l <= stt and end <= r:
+            return grp[p]
+
+        mid = (stt + end) // 2
+        return ssum(stt, mid, p*2, l, r) + ssum(mid + 1, end, p*2 + 1, l, r)
+
+    def sudt(stt, end, p, idx, dif):
+        if idx < stt or end < idx:
+            return
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+        grp[p] += dif
 
+        if stt != end:
+            mid = (stt + end) // 2
+            sudt(stt, mid, p*2, idx, dif)
+            sudt(mid + 1, end, p*2 + 1, idx, dif)
+
+    n, m, k = map(int, input().split())
+    arr = [0] + [int(input().strip()) for _ in range(n)]
+    grp = [0] * (n*4)
+    sgmt(1, n, 1)
+
+    for _ in range(m+k):
+        flg, a, b = map(int, input().split())
+        
+        if flg == 1:
+            sudt(1, n, 1, a, b - arr[a])
+            arr[a] = b
+        
+        if flg == 2:
+            print(ssum(1, n, 1, a, b))
 
     # ######## INPUT AREA END ############
 

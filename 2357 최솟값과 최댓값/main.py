@@ -21,27 +21,37 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    def sgmt(stt, end, nde):
+        if stt == end:
+            grp[nde] = [arr[stt], arr[stt]]
+            return grp[nde]
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+        mid = (stt+end) // 2
+        l = sgmt(stt, mid, nde*2)
+        r = sgmt(mid+1, end, nde*2+1)
+        grp[nde] = [min(l[0], r[0]), max(l[1], r[1])]
+        return grp[nde]
     
-    print(min(dp[1 - flg]))
+    def sfnd(stt, end, nde, L, R):
+        if R < stt or end < L:
+            return [inf, 0]
+        if L <= stt and end <= R:
+            return grp[nde]
+        
+        mid = (stt+end) // 2
+        l = sfnd(stt, mid, nde*2, L, R)
+        r = sfnd(mid+1, end, nde*2+1, L, R)
+        return [min(l[0], r[0]), max(l[1], r[1])]
 
+    n, m = map(int, input().split())
+    inf = int(1e9)
+    grp = [0] * (n*4)
+    arr = [0] + [int(input().strip()) for _ in range(n)]
+    sgmt(1, n, 1)
+
+    for _ in range(m):
+        a, b = map(int, input().split())
+        print(*sfnd(1, n, 1, a, b))
 
     # ######## INPUT AREA END ############
 

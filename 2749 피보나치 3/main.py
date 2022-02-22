@@ -21,27 +21,19 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    A = [[0, 1], [1, 1]]
+    O = [[1, 0], [0, 1]]
+    N = int(input().strip())
+    M = 1000000
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    while N:
+        if N % 2:
+            O = [[sum(O[i][k] * A[k][j] % M for k in range(2)) % M for j in range(2)] for i in range(2)]
+            N -= 1
+        A = [[sum(A[i][k] * A[k][j] % M for k in range(2)) % M for j in range(2)] for i in range(2)]
+        N //= 2
     
-    print(min(dp[1 - flg]))
-
+    print(O[0][1])
 
     # ######## INPUT AREA END ############
 

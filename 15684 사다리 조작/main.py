@@ -21,26 +21,55 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
-
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    def check():
+        for x in range(n-1):
+            t = x
+            for y in range(h):
+                x += grp[y][x]
+            if x != t:
+                return 0
+        return 1
     
-    print(min(dp[1 - flg]))
+    def solve(c):
+        if not c:
+            return check()
+        
+        for y in range(h):
+            for x in range(n-1):
+                if grp[y][x] == grp[y][x+1]:
+                    grp[y][x], grp[y][x+1] = 1, -1
+                    if solve(c-1):
+                        return 1
+                    grp[y][x], grp[y][x+1] = 0, 0
+        return 0
+    
+    def prune():
+        res = 0
+        for x in range(n-1):
+            t = x
+            for y in range(h):
+                x += grp[y][x]
+            if x != t:
+                res += 1
+        return res
+
+    n, m, h = map(int, input().split())
+    grp = [[0] * n for _ in range(h)]
+    for _ in range(m):
+        y, x = map(int, input().split())
+        y -= 1
+        grp[y][x-1], grp[y][x] = 1, -1
+    
+    if prune() > 6:
+        print(-1)
+        return
+
+    for i in range(4):
+        if solve(i):
+            print(i)
+            break
+    else:
+        print(-1)
 
 
     # ######## INPUT AREA END ############

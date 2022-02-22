@@ -21,27 +21,33 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    N = int(input().strip())
+    grp = [[] for _ in range(N+1)]
+    cst = [0] * (N+1)
+    ind = [0] * (N+1)
+    ans = [0] * (N+1)
+    q = []
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    for i in range(1, N+1):
+        tmp = list(map(int, input().split()))
+        cst[i] = tmp[0]
+        if len(tmp)-2:
+            for j in tmp[1 : -1]:
+                grp[j].append(i)
+                ind[i] += 1
+        else:
+            q.append(i)
+            ans[i] = cst[i]
     
-    print(min(dp[1 - flg]))
-
+    while q:
+        x = q.pop()
+        for i in grp[x]:
+            ans[i] = max(ans[i], cst[i] + ans[x])
+            ind[i] -= 1
+            if not ind[i]:
+                q.append(i)
+    
+    print('\n'.join(map(str, ans[1:])))
 
     # ######## INPUT AREA END ############
 

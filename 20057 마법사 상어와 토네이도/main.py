@@ -21,27 +21,57 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    N = int(input().strip())
+    dy = [0, 1, 0, -1]
+    dx = [-1, 0, 1, 0]
+    dd = [(2, 0, 0.05), (1, 1, 0.1), (0, 1, 0.07), (0, 2, 0.02), (-1, 1, 0.01)]
+    brd = [list(map(int, input().split())) for _ in range(N)]
+    ans = 0
+    f, d, c = 1, 0, 1
+    flg_a, flg_b = 2, 1
+    y, x = N//2, N//2
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    for _ in range(1, N**2):
+        y += dy[d]
+        x += dx[d]
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+        snd_psh = brd[y][x]
 
+        if brd[y][x] >= 10:
+            for i in range(1, 10):
+                f *= -1
+                i //= 2
+                fwd, sde, pct = dd[i]
+                snd_mov = int(brd[y][x] * pct)
+                if snd_mov:
+                    snd_psh -= snd_mov
+                    td = (d + f) % 4
+                    ny = y + fwd * dy[d] + sde * dy[td]
+                    nx = x + fwd * dx[d] + sde * dx[td]
+                    if 0 <= ny < N and 0 <= nx < N:
+                        brd[ny][nx] += snd_mov
+                    else:
+                        ans += snd_mov
+        
+        ny = y + dy[d]
+        nx = x + dx[d]
+        if 0 <= ny < N and 0 <= nx < N:
+            brd[ny][nx] += snd_psh
+        else:
+            ans += snd_psh
+        
+        brd[y][x] = 0
+
+        c -= 1
+        if not c:
+            d = (d + 1) % 4
+            flg_a -= 1
+            if not flg_a:
+                flg_a = 2
+                flg_b += 1
+            c = flg_b
+
+    print(ans)
 
     # ######## INPUT AREA END ############
 

@@ -21,27 +21,37 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    def dfs(y, x):
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+        if vis[y][x]:
+            if not dp[y][x]:
+                print(-1)
+                sys.exit()
+            return dp[y][x]
+
+        vis[y][x] = 1
+        res = 1
+        n = int(brd[y][x])
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+        for i in range(4):
+            ny = dy[i] * n + y
+            nx = dx[i] * n + x
+            if 0 <= ny < N and 0 <= nx < M and brd[ny][nx] != 'H':
+                res = max(res, dfs(ny, nx) + 1)
+                
+        dp[y][x] = res
+        
+        return res
 
+    N, M = map(int, input().split())
+    dy = [1, -1, 0, 0]
+    dx = [0, 0, 1, -1]
+    brd = [list(input().strip()) for _ in range(N)]
+    vis = [[0] * M for _ in range(N)]
+    dp = [[0] * M for _ in range(N)]
+
+    dfs(0, 0)
+    print(dp[0][0])
 
     # ######## INPUT AREA END ############
 

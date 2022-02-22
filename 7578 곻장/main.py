@@ -12,7 +12,7 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import bisect_left as bl
 DEBUG = False
 
 
@@ -21,26 +21,54 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
+    n = int(input().strip())
+    h = 2 ** (len(format(n, 'b')))
+    tree = [0] * 2*h
+    h -= 1
+    ans = 0
+    arr_A = input().split()
+    arr_B = input().split()
+    num_d = dict()
+    for i in range(n):
+        num_d[arr_A[i]] = i
 
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    x = h + num_d[arr_B[0]]
+    tree[x] = 1
+    while x > 1:
+        x //= 2
+        tree[x] += 1
+
+    for i in range(1, n-1):
+        t = num_d[arr_B[i]]
+        l, r = h+t+1, h+n
+        while l <= r:
+            if l % 2:
+                ans += tree[l]
+                l += 1
+            if not r % 2:
+                ans += tree[r]
+                r -= 1
+            l //= 2
+            r //= 2
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+        x = h+t
+        tree[x] = 1
+        while x > 1:
+            x //= 2
+            tree[x] += 1
     
-    print(min(dp[1 - flg]))
+    l, r = h+num_d[arr_B[-1]]+1, h+n
+    while l <= r:
+        if l % 2:
+            ans += tree[l]
+            l += 1
+        if not r % 2:
+            ans += tree[r]
+            r -= 1
+        l //= 2
+        r //= 2
+    
+    print(ans)
 
 
     # ######## INPUT AREA END ############

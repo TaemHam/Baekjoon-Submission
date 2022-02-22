@@ -26,30 +26,16 @@ def main(f=None):
     grp = [list(map(int, input().split())) for _ in range(n)]
     grp.sort()
 
-    a, b= [], []
+    a = []
     for i in range(n):
-        idx, val = grp[i]
+        _, val = grp[i]
         if not a or val > a[-1]:
-            b.append((idx, len(a)))
             a.append(val)
         else:
-            t = bl(a, val)
-            a[t] = val
-            b.append((idx, t))
+            a[bl(a, val)] = val
 
-    ans = []
-    p = len(a)-1
-    while b:
-        idx, t = b.pop()
-        if p == t:
-            p -= 1
-        else:
-            ans.append(idx)
-
-    print(len(ans))
-    while ans:
-        print(ans.pop())
-
+    print(n - len(a))
+    
     # ######## INPUT AREA END ############
 
 

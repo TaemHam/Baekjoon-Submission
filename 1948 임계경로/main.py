@@ -21,27 +21,45 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
-
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
-        
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
+    N = int(input().strip())
+    M = int(input().strip())
+    grp_forw = [[] for _ in range(N+1)]
+    grp_bakw = [[] for _ in range(N+1)]
+    ind = [0] * (N+1)
+    for _ in range(M):
+        U, V, P = map(int, input().split())
+        grp_forw[U].append((V, P))
+        grp_bakw[V].append((U, P))
+        ind[V] += 1
+    S, D = map(int, input().split())
+    dp = [0] * (N+1)
+    q = [(0, S)]
+    while q:
+        d, p = q.pop()
+        for np, td in grp_forw[p]:
+            ind[np] -= 1
+            dp[np] = max(dp[np], d + td)
+            if ind[np]:
+                continue
+            q.append((dp[np], np))
     
-    print(min(dp[1 - flg]))
+    q = [(dp[D], D)]
+    vis = [0] * (N+1)
+    vis[D] = 1
+    cnt = 0
 
+    while q:
+        d, p = q.pop()
+        for np, td in grp_bakw[p]:
+            nd = d - td
+            if nd == dp[np]:
+                cnt += 1
+                if not vis[np]:
+                    vis[np] = 1
+                    q.append((nd, np))
+
+    print(dp[D])
+    print(cnt)
 
     # ######## INPUT AREA END ############
 

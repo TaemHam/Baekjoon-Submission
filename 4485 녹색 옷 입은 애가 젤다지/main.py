@@ -6,7 +6,7 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-#from collections import deque
+from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
@@ -21,26 +21,37 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    cmd = list(map(int, input().split()))[:-1]
-    move = ((0, 2, 2, 2, 2), (0, 1, 3, 4, 3), (0, 3, 1, 3, 4), (0, 4, 3, 1, 3), (0, 3, 4, 3, 1))
-    dp= [[0] * 5 for _ in range(2)]
-    dp[1][0] = 0
-    dp[1][1] = dp[1][2] = dp[1][3] = dp[1][4] = 4 * len(cmd)
-    prv, flg = 0, 0
-    for nxt in cmd:
-        print(nxt)
-        for j in range(5):
-            dp[flg][j] = dp[1-flg][j] + move[prv][nxt]
-        print(dp)
-
-        for j in range(5):
-            dp[flg][prv] = min(dp[flg][prv], dp[1-flg][j] + move[j][nxt])
+    inf = int(1e9)
+    dy = [0, 0, -1, 1]
+    dx = [-1, 1, 0, 0]
+    cnt = 0
+    while True:
+        cnt += 1
+        n = int(input().strip())
+        if n == 0:
+            break
         
-        prv = nxt
-        flg = 1 - flg
-        print(dp)
-    
-    print(min(dp[1 - flg]))
+        grp = [list(map(int, input().split())) for _ in range(n)]
+        dp = [[inf] * n for _ in range(n)] 
+        dp[0][0] = grp[0][0]
+        q = deque([(0, 0, grp[0][0])])
+        while q:
+            y, x, v = q.popleft()
+            if v > dp[y][x]:
+                continue
+
+            for i in range(4):
+                ny = y + dy[i]
+                nx = x + dx[i]
+                if 0 <= ny < n and 0 <= nx < n:
+                    nv = dp[y][x] + grp[ny][nx]
+                    if nv < dp[ny][nx]:
+                        dp[ny][nx] = nv
+                        if not(ny == n-1 and nx == n-1):
+                            q.append((ny, nx, nv))
+
+        print('Problem ' + str(cnt) + ': ' + str(dp[-1][-1]))
+
 
 
     # ######## INPUT AREA END ############
