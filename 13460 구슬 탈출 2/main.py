@@ -1,4 +1,5 @@
 # CP template Version 1.006
+#import io
 import os
 import sys
 #import string
@@ -6,115 +7,103 @@ import sys
 #import itertools
 #from itertools import product
 #import collections
-from collections import deque
+#from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import insort_left as il
 DEBUG = False
 
 
 def main(f=None):
     init(f)
-    # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n, m = map(int, input().split())
-    grp = []
-    for y in range(n):
-        t = input().strip()
-        if 0 < y < n-1:
-            for x in range(1, m-1):
-                if t[x] == 'R':
-                    red = (y, x)
-                elif t[x] == 'B':
-                    blu = (y, x)
-        grp.append(t)
+    N, M = map(int, input().split())
+    NM = N*M
+    cur = 0 # 구슬 좌표
+    tgt = 0 # 구멍 좌표                 
+    mov = [[0] * NM for _ in range(4)]          # mov에는 각 위치에서 기울였을 때 움직이는 칸 수를 저장
+    mov_y = [M] * M                             # 0이 위, 1이 아래, 2가 왼쪽, 3이 오른쪽
 
-    dy = [1, -1, 0, 0]          # 아래, 위, 오른쪽, 왼쪽
-    dx = [0, 0, 1, -1]
-
-    q = deque()
-    q.append((red, blu, -1))
-    check, move = 1, 1
-
-    while move <= 10 and q:
-        c_r, c_b, p_i = q.popleft()
-        if p_i in [0, 1]:
-            l, r = 2, 4
-        elif p_i in [2, 3]:
-            l, r = 0, 2
-        else:
-            l, r = 0, 4
-        check -= 1
-
-        for i in range(l, r):                       #방향 체크 해서 움직일 수 있는지 봄
-            dir_y = c_r[0] + dy[i]
-            dir_x = c_r[1] + dx[i]
-            if (dir_y, dir_x) == c_b:               #파란 구슬이 있으면 그 다음칸 체크
-                dir_y += dy[i]
-                dir_x += dx[i]
-
-            if grp[dir_y][dir_x] == '#':
-                dir_y = c_b[0] + dy[i]
-                dir_x = c_b[1] + dx[i]
-                if (dir_y, dir_x) == c_r:
-                    dir_y += dy[i]
-                    dir_x += dx[i]
-                if grp[dir_y][dir_x] == '#':
-                    continue
-
-            cas = 0
-            b_y, b_x = c_b
-            while grp[b_y][b_x] != '#':
-                b_y += dy[i]
-                b_x += dx[i]
-                if grp[b_y][b_x] == 'O':
-                    cas = 1
-                    break
-                if (b_y, b_x) == c_r:
-                    cas = 2
-            if cas == 1:                # 파란 구슬이 골인 하는 경우는 스킵
+    input()                             
+    for y in range(M, NM, M):                   #   #######  /  0   0   0   0   0   0   0  <- 벽이 있는 줄
+        tmp = input().strip()                   #   #.....#  /  0   0   0   0   0   0   0  <- 위로 0칸 움직일 수 있음
+        mov_x = 1                               #   #.....#  /  0  -7  -7  -7  -7  -7   0  <- 위로 1칸 (= M만큼)
+        for x in range(1, M):                   #   #..#..#  /  0 -14 -14   0 -14 -14   0  <- 가운데 벽 제외 위로 2칸
+                                                #   #.....#  /  0 -21 -21   0 -21 -21   0
+            if tmp[x] == '#':                   #   #.....#  /  0 -28 -28  -7 -28 -28   0
+                for i in range(mov_y[x], y, M): #   #######  /  0   0   0   0   0   0   0
+                    mov[1][x+i] = y - M - i     #     원본   /           mov[0]
+                for i in range(mov_x, x):
+                    mov[3][y+i] = x - 1 - i
+                mov_y[x] = y + M
+                mov_x = x + 1
                 continue
-            elif cas == 2:              # 빨간 구슬이 경로에 있는 경우 1칸 전에 멈춰야함
-                b_y -= dy[i]
-                b_x -= dx[i]
-            n_b = (b_y - dy[i], b_x - dx[i])
+            mov[0][y+x] = mov_y[x] - y
+            mov[2][y+x] = mov_x - x
 
-            r_y, r_x = c_r
-            while grp[r_y][r_x] != '#':
-                r_y += dy[i]
-                r_x += dx[i]
-                if grp[r_y][r_x] == 'O':
-                    cas = 3
-                    break
-                if (r_y, r_x) == c_b and cas == 0:
-                    cas = 4
-            if cas == 3:                # 빨간 구슬이 골인 하는 경우는 끝내야함
-                print(move)
-                return
-            elif cas == 4:
-                r_y -= dy[i]
-                r_x -= dx[i]
-            n_r = (r_y - dy[i], r_x - dx[i])
+            if tmp[x] == 'R':
+                cur += y + x
+            elif tmp[x] == 'B':
+                cur += (y + x) * NM
+            elif tmp[x] == 'O':
+                tgt += y + x
 
-            q.append((n_r, n_b, i))
-        if check == 0:
-            move += 1
-            check = len(q)
+    bak = (M, -M, 1, -1)    #       |  d%2 == 1  |  d%2 == 0    
+    ans = -1                # ------|------------|------------  
+    vis = [0] * NM*NM       # a < b |      1     |      0       check는 
+    vis[cur] = 1            # ------|------------|------------  구슬 겹치는지 + 구멍에 빠졌는지
+    cque = [cur]            # a > b |      0     |      1       확인하기 위한 XOR 함수
+    check = lambda d, a, b: (1 if a < b else 0) if d%2 else (0 if a < b else 1)
 
-    print(-1)
+    for t in range(1, 11):
 
+        nque = []
 
+        for cur in cque:
+            Bcur, Rcur = divmod(cur, NM)
 
+            for dir in range(4):
+                Bnxt = Bcur + mov[dir][Bcur]
+                Rnxt = Rcur + mov[dir][Rcur]
 
+                # 파란 구슬이 빠지는 경우
+                if Bnxt == tgt + mov[dir][tgt]:
+                    if check(dir, Bcur, tgt):
+                        continue
 
+                # 빨간 구슬이 빠지는 경우
+                if Rnxt == tgt + mov[dir][tgt]:
+                    if check(dir, Rcur, tgt):
+                        ans = t
+                        cque.clear()
+                        nque = []
+                        break
 
+                # 구슬 위치가 겹치는 경우
+                if Bnxt == Rnxt:
+                    Rnxt += bak[dir]
+                    if check(dir, Bcur, Rcur):
+                        Rnxt, Bnxt = Bnxt, Rnxt
 
+                # 방문한 위치에 있는 경우
+                if vis[Bnxt * NM + Rnxt]:
+                    continue
+                
+                # 다음 큐에 추가
+                vis[Bnxt * NM + Rnxt] = 1
+                nque.append(Bnxt * NM + Rnxt)
+            
+        if not nque:
+            break
+        cque = nque
+    
+    print(ans)
 
-    # ######## INPUT AREA END ############
+    ######## INPUT AREA END ############
 
 
 # TEMPLATE ###############################
@@ -147,7 +136,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
+    input = sys.stdin.readline #io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

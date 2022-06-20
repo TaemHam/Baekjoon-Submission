@@ -3,7 +3,7 @@ import os
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
-import itertools
+#from itertools import combinations
 #from itertools import product
 #import collections
 #from collections import deque
@@ -20,34 +20,43 @@ def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
-
-    n, m = map(int, input().split())
-    grp = []
-    l_h, l_c = [], []
-    for y in range(n):
-        t = input().split()
-        grp.append(t)
-        for x in range(n):
-            if t[x] == '1':
-                l_h.append((y, x))
-            elif t[x] == '2':
-                l_c.append((y, x))
     
-    perm = list(itertools.combinations(l_c, m))
+    def comb_type2(arr, ret, cache, cnt, idx):
+        if cnt == 1:
+            ret.append(cache + [arr[idx]])
+        else:
+            comb_type2(arr, ret, cache + [arr[idx]], cnt - 1, idx + 1)
+            if len(arr) - idx - 1 >= cnt:
+                comb_type2(arr, ret, cache, cnt, idx + 1)
+
+    N, M = map(int, input().split())
+    jip, chi = [], []
     ans = int(1e9)
-    for i in perm:
-        dist_h = 0
-        for h in l_h:
-            min_d = int(1e9)
-            for c in i:
-                t = abs(c[0] - h[0]) + abs(c[1] - h[1])
-                min_d = min(min_d, t)
-            dist_h += min_d
-        if dist_h < ans:
-            ans = dist_h
+    for y in range(N):
+        brd = input().split()
+        for x in range(N):
+            if brd[x] == '1':
+                jip.append((y, x))
+            elif brd[x] == '2':
+                chi.append((y, x))
+    
+    grp = []
+    for i in range(len(jip)):
+        tmp = []
+        for j in range(len(chi)):
+            tmp.append(abs(jip[i][0] - chi[j][0]) + abs(jip[i][1] - chi[j][1]))
+        grp.append(tmp)
+    
+    for arr in combinations(range(len(chi)), M):
+        res = 0
+        for e in grp:
+            mnm = int(1e9)
+            for k in arr:
+                mnm = min(mnm, e[k])
+            res += mnm
+        ans = min(ans, res)
 
     print(ans)
-                    
 
     # ######## INPUT AREA END ############
 

@@ -21,32 +21,29 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    dy = [0, -1, 0, 1]
-    dx = [1, 0, -1, 0]
-    n = int(input().strip())
-    grp = [[0] * 101 for _ in range(101)]
+    N = int(input().strip())
+    mov = (1, -102, -1, 102)
+    brd = set()
 
-    for _ in range(n):
+    for _ in range(N):
         x, y, d, g = map(int, input().split())
-        grp[y][x] = 1
-        y += dy[d]
-        x += dx[d]
-        grp[y][x] = 1
+        cur = y*102+x
+        brd.add(cur)
+        cur += mov[d]
+        brd.add(cur)
         stk = [(d+1)%4]
         for _ in range(g):
-            for i in range(len(stk)-1, -1, -1):
-                y += dy[stk[i]]
-                x += dx[stk[i]]
-                grp[y][x] = 1
-                stk.append((stk[i]+1)%4)
+            for d in reversed(stk):
+                cur += mov[d]
+                brd.add(cur)
+                stk.append((d+1)%4)
 
-    cnt = 0
-    for y in range(100):
-        for x in range(100):
-            if grp[y][x] and grp[y][x+1] and grp[y+1][x] and grp[y+1][x+1]:
-                cnt += 1
-
-    print(cnt)
+    ans = 0
+    for cur in brd:
+        if cur+1 in brd and cur+102 in brd and cur+103 in brd:
+            ans += 1
+    
+    print(ans)
 
     # ######## INPUT AREA END ############
 

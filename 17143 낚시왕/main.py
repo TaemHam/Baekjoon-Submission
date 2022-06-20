@@ -21,52 +21,89 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    dx = [-1, 1, 0, 0]
-    dy = [0, 0, 1, -1]
-    dd = [1, 0, 3, 2]
+    def catch(cur):
+        for dep in range(R):
+            if brd[dep][cur]:
+                num = brd[dep][cur]
+                del shk[num]
+                brd[dep][cur] = 0
+                return num
+        return 0
+    
+    def up(r, c, s, d):
+        r -= s
+        if r < 0:
+            r = -r
+            d = 2
+        return r, c, s, d
+
+    def dwn(r, c, s, d):
+        r += s
+        if r >= R:
+            r = rl-r
+            d = 1
+        return r, c, s, d
+
+    def rgt(r, c, s, d):
+        c += s
+        if c >= C:
+            c = cl-c
+            d = 4
+        return r, c, s, d
+
+    def lft(r, c, s, d):
+        c -= s
+        if c < 0:
+            c = -c
+            d = 3
+        return r, c, s, d
+
     R, C, M = map(int, input().split())
-
-    g = [[0] * C for i in range(R)]
-    for i in range(1, M + 1):
-        r, c, s, d, z = map(int, input().split())
-        g[r-1][c-1] = [s, d-1, z]
-
-    def move():
-        t = [[0] * C for _ in range(R)]
-        for i in range(R):
-            for j in range(C):
-                if g[i][j] != 0:
-                    x, y, s, d, z = i, j, g[i][j][0], g[i][j][1], g[i][j][2]
-                    while s > 0:
-                        x += dx[d]
-                        y += dy[d]
-                        if 0 <= x < R and 0 <= y < C:
-                            s -= 1
-                        else:
-                            x -= dx[d]
-                            y -= dy[d]
-                            d = dd[d]
-                    if t[x][y] == 0:
-                        t[x][y] = [g[i][j][0], d, z]
-                    else:
-                        if t[x][y][2] < z:
-                            t[x][y] = [g[i][j][0], d, z]
-        return t
-
+    rl, cl = (R-1)*2, (C-1)*2
     ans = 0
-    for i in range(C):
-        for j in range(R):
-            if g[j][i] != 0:
-                ans += g[j][i][2]
-                g[j][i] = 0
-                break
-        g = move()
-    print(ans)               
+    run = []
+    shk = {}
+    mov = (0, up, dwn, rgt, lft)
+    flp = (0, 2, 1, 4, 3)
+    brd = [[0] * C for _ in range(R)]
 
+    for _ in range(M):
+        r, c, s, d, z = map(int, input().split())
+        r, c = r-1, c-1
+        if d//3:
+            s %= cl
+            if s >= C:
+                s = cl-s
+                d = flp[d]
+        else:
+            s %= rl
+            if s >= R:
+                s = rl-s
+                d = flp[d]
+        shk[z] = (r, c, s, d)
+        brd[r][c] = z
+    
+    for cur in range(C-1):
+
+        ans += catch(cur)
+
+        nxt = [[0] * C for _ in range(R)]
+        for z in shk:
+            r, c, s, d = mov[shk[z][3]](*shk[z])
+            shk[z] = (r, c, s, d)
+            if nxt[r][c]:
+                if nxt[r][c] < z:
+                    nxt[r][c], z = z, nxt[r][c]
+                run.append(z)
+            else:
+                nxt[r][c] = z
+
+        while run:
+            del shk[run.pop()]
+        brd = nxt
+    
+    print(ans + catch(C-1))
         
-
-
-
     # ######## INPUT AREA END ############
 
 

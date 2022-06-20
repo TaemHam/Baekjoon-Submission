@@ -1,6 +1,5 @@
 # CP template Version 1.006
 import os
-from re import L
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial

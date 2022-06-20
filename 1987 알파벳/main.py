@@ -22,16 +22,19 @@ def main(f=None):
     # ######## INPUT AREA BEGIN ##########
 
     R, C = map(int, input().split())
-    grp = []
-    for _ in range(R):
-        grp.append(list(input().strip()))
-    l = [['']*C for _ in range(R)]
-    dy = [1, -1, 0, 0]
-    dx = [0, 0, 1, -1]
-    q = [(0, 0, 1, grp[0][0])]
     ans = 0
+    num = lambda y, x: 1 << ord(grp[y][x])-65
+    vis = [[0] * C for _ in range(R)]
+    grp = [input().strip() for _ in range(R)]
+    oob = [[1] * (C+1) for _ in range(R)] + [[0] * (C+1)]
+    for i in range(R):
+        oob[i][C] = 0
+    dy = (1, -1, 0, 0)
+    dx = (0, 0, 1, -1)
+    q = [(0, 0, 1, num(0, 0))]
+
     while q:
-        y, x, cnt, d = q.pop()
+        y, x, cnt, cur = q.pop()
         if ans < cnt:
             ans = cnt
             if ans == 26:
@@ -39,11 +42,9 @@ def main(f=None):
         for i in range(4):
             ny = y + dy[i]
             nx = x + dx[i]
-            if 0 <= ny < R and 0 <= nx < C and grp[ny][nx] not in d:
-                t = d + grp[ny][nx]
-                if l[ny][nx] != t:
-                    l[ny][nx] = t
-                    q.append((ny, nx, cnt+1, t))
+            if oob[ny][nx] and not cur & num(ny, nx) and vis[ny][nx] ^ (cur|num(ny, nx)):
+                vis[ny][nx] = cur|num(ny, nx)
+                q.append((ny, nx, cnt+1, cur|num(ny, nx)))
 
     print(ans)
 

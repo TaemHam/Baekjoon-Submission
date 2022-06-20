@@ -20,89 +20,74 @@ def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
-    dy = [0, -1, 1, 0, 0]
-    dx = [0, 0, 0, -1, 1]
+
     N, M, K = map(int, input().split())
-    remove_list = set()
-    remaining = set(range(1, M+1))
-    shark = [[] for _ in range(M+1)]
-    smell = [[0] * N for _ in range(N)]
-    trail = set()
-    mov = [[tuple()] for _ in range(M+1)]
-    brd = []
-    for y in range(N):
-        tmp = list(map(int, input().split()))
-        for x in range(N):
-            if tmp[x]:
-                shark[tmp[x]] = [y, x]
-                smell[y][x] = K
-                trail.add((y, x))
-        brd.append(tmp)
+    L = N+1
+    M += 1
+    mov = (-L, L, -1, 1)
+    pri = [[] for _ in range(M)]
+    rmn = set(range(1, M))
+    loc = [0] * M
+    brd = [0] * N*L
+    odr = [0] * N*L + [-1] * L
+    who = [0] * L*L
+    ans = -1
+    for y in range(0, N*L, L):
+        odr[y+N] = -1
+        brd[y:y+N] = map(int, input().split())
+        for xy in range(y, y+N):
+            if brd[xy]:
+                loc[brd[xy]] = xy
+                odr[xy] = K
+                who[xy] = brd[xy]
     
-    
-    dir = [0] + list(map(int, input().split()))
-    for i in range(1, M+1):
-        shark[i].append(dir[i])
+    dir = [0] + list(map(lambda x: int(x)-1, input().split()))
+    for i in range(1, M):
         for _ in range(4):
-            mov[i].append(tuple(map(int, input().split())))
-    
+            pri[i].append(tuple(map(lambda x: int(x)-1, input().split())))
 
-    for sec in range(1, 1001):
+    for time in range(1, 1001):
 
-        # 이동 페이즈
-        for ith_shk in remaining:
-            y, x, d = shark[ith_shk]
-            cnd = []
+        '''이동 페이즈'''
+        for shk in rmn:
+            brd[loc[shk]] = 0
+            cnd = ()
 
             for i in range(4):
-                nd = mov[ith_shk][d][i]
-                ny = y + dy[nd]
-                nx = x + dx[nd]
-                if 0 <= ny < N and 0 <= nx < N:
-                    if not brd[ny][nx]:
-                        shark[ith_shk] = [ny, nx, nd]
-                        break
-                    elif brd[ny][nx] == ith_shk and not cnd:
-                        cnd = [ny, nx, nd]
+                nd = pri[shk][dir[shk]][i]
+                nxt = loc[shk] + mov[nd]
+                if not odr[nxt]:
+                    cnd = (nxt, nd)
+                    break
+                elif who[nxt] == shk and not cnd:
+                    cnd = (nxt, nd)
+            
+            loc[shk], dir[shk] = cnd
+
+        '''냄새 페이즈'''
+        for y in range(0, N*L, L):
+            for xy in range(y, y+N):
+                if odr[xy]:
+                    odr[xy] -= 1
+
+        '''도망 페이즈'''
+        run = set()
+        for shk in rmn:
+            cur = loc[shk]
+            if not brd[cur]:
+                brd[cur] = shk
+                who[cur] = shk
+                odr[cur] = K
             else:
-                shark[ith_shk] = cnd
-        
+                run.add(shk)
+        rmn -= run
 
-        # 냄새 삭제 페이즈
-        for y, x in trail:
-            smell[y][x] -= 1
-            if not smell[y][x]:
-                brd[y][x] = 0
-                remove_list.add((y, x))
-        while remove_list:
-            trail.discard(remove_list.pop())
-
-
-        # 빤스런, 냄새 갱신 페이즈
-        for ith_shk in remaining:
-            y, x, _ = shark[ith_shk]
-
-            if not brd[y][x]:
-                brd[y][x] = ith_shk
-                smell[y][x] = K
-                trail.add((y, x))
-            else:
-                if brd[y][x] == ith_shk:
-                    smell[y][x] = K
-                else:
-                    remove_list.add(ith_shk)
-        while remove_list:
-            remaining.discard(remove_list.pop())
-
-        # 정답 체크 페이즈
-        if len(remaining) == 1:
-            print(sec)
+        '''정답 체크 페이즈'''
+        if len(rmn) == 1:
+            ans = time
             break
     
-    else:
-        print(-1)
-
-
+    print(ans)
 
     # ######## INPUT AREA END ############
 

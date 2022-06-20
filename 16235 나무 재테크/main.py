@@ -21,61 +21,60 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    dy = [-1, -1, -1, 0, 0, 1, 1, 1]
-    dx = [-1, 0, 1, -1, 1, -1, 0, 1]
     N, M, K = map(int, input().split())
-    A = [list(map(int, input().split())) for _ in range(N)]
-    nutr = [[5] * N for _ in range(N)]
-    land = [[dict() for _ in range(N)] for _ in range(N)]
+    L = N+1                                             # 격자 바깥을 판별하기 위해 s2d2 배열에 꼼수를 씀
+    mov = (-1, -1-L, -L, -L+1, 1, 1+L, L, L-1)          # 2 3 2 3 2 0 <- 나무가 번식할 좌표에서 s2d2[좌표] 가 0이 나오면
+    s2d2 = [0] * L*L                                    # 2 3 2 3 2 0    격자 바깥이라는 의미, 나무를 번식시키지 않음
+    nutr = [5] * N*L                                    # 2 3 2 3 2 0 
+    land = [dict() for _ in range(N*L)]                 # 2 3 2 3 2 0
+    for y in range(0, N*L, L):                          # 2 3 2 3 2 0
+        s2d2[y:y+N] = map(int, input().split())         # 0 0 0 0 0 0
+
     for _ in range(M):
         x, y, z = map(int, input().split())
-        land[x-1][y-1][z] = 1
+        land[(x-1)*L+(y-1)][z] = 1
     
     for _ in range(K):
 
-        for y in range(N):
-            for x in range(N):
-                if land[y][x]:
-                    dead = 0
-                    alive = dict()
-                    nutri = nutr[y][x]
+        '''봄, 여름 페이즈'''
+        for xy in range(N*L):
 
-                    for age in sorted(land[y][x].keys()):
-                        trees = land[y][x][age]
-                        if nutri >= age * trees:
-                            alive[age + 1] = trees
-                            nutri -= age * trees
-                        else:
-                            survived = nutri // age
-                            if survived:
-                                alive[age + 1] = survived
-                                nutri -= age * survived
-                            dead += age // 2 * (trees - survived)
+            if land[xy]:
+                dead = 0
+                alive = dict()
+                nutri = nutr[xy]
 
-                    nutr[y][x] = nutri + dead
-                    land[y][x] = alive
+                for age in sorted(land[xy].keys()):
+                    trees = land[xy][age]
+                    if nutri >= age * trees:
+                        alive[age + 1] = trees
+                        nutri -= age * trees
+                    else:
+                        survived = nutri // age
+                        if survived:
+                            alive[age + 1] = survived
+                            nutri -= age * survived
+                        dead += age // 2 * (trees - survived)
 
-        for y in range(N):
-            for x in range(N):
-                nutr[y][x] += A[y][x]
+                land[xy] = alive
+                nutr[xy] = nutri + dead
 
-                for age in land[y][x]:
+        '''가을, 겨울 페이즈'''
+        for xy in range(N*L):
+
+            if s2d2[xy]:
+                for age in land[xy]:
                     if not age % 5:
-                        for i in range(8):
-                            ny = y + dy[i]
-                            nx = x + dx[i]
-                            if 0 <= ny < N and 0 <= nx < N:
-                                if 1 in land[ny][nx]:
-                                    land[ny][nx][1] += land[y][x][age]
+                        for d in mov:
+                            if s2d2[xy+d]:
+                                if 1 in land[xy+d]:
+                                    land[xy+d][1] += land[xy][age]
                                 else:
-                                    land[ny][nx][1] = land[y][x][age]
-    answer = 0
-    for y in range(N):
-        for x in range(N):
-            for age in land[y][x]:
-                answer += land[y][x][age]
+                                    land[xy+d][1] = land[xy][age]
+                                    
+                nutr[xy] += s2d2[xy]
 
-    print(answer)
+    print(sum(sum(land[xy].values()) for xy in range(N*L)))
 
     # ######## INPUT AREA END ############
 

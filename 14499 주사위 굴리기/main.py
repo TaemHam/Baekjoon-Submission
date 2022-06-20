@@ -21,38 +21,42 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n, m, y, x, _ = map(int, input().split())
-    brd = [list(map(int, input().split())) for _ in range(n)]
-    dy = [0, 0, 0, -1, 1]
-    dx = [0, 1, -1, 0, 0]
+    dd = [0, 1, -1, -100, 100]
+    N, M, Y, X, _ = map(int, input().split())
+    siz = 100 * N + M
+    cur = 100 * Y + X
+    ans = []
+    brd = [0] * siz
+    oob = [1] * siz
+    for y in range(0, 100*N, 100):
+        oob[y:y+M] = [0] * M
+        brd[y:y+M] = list(map(int, input().split()))
 
-    up, dn, lf, rt, fr, bk = 0, 0, 0, 0, 0, 0
-
-    cmd = list(map(int, input().split()))
+    top, bot, lft, rgt, frt, bak = 0, 0, 0, 0, 0, 0
     
-    for c in cmd:
-        ny = y + dy[c]
-        nx = x + dx[c]
-        if not 0 <= ny < n or not 0 <= nx < m:
+    for cmd in map(int, input().split()):
+        if oob[cur + dd[cmd]]:
             continue
-        y, x = ny, nx
 
-        if c == 1:
-            up, lf, dn, rt = lf, dn, rt, up
-        elif c == 2:
-            up, lf, dn, rt = rt, up, lf, dn
-        elif c == 3:
-            up, fr, dn, bk = fr, dn, bk, up
-        else: # c == 4:
-            up, fr, dn, bk = bk, up, fr, dn
+        cur += dd[cmd]
 
-        print(up)
+        if cmd == 1:
+            top, lft, bot, rgt = lft, bot, rgt, top
+        elif cmd == 2:
+            top, lft, bot, rgt = rgt, top, lft, bot
+        elif cmd == 3:
+            top, frt, bot, bak = frt, bot, bak, top
+        else: # cmd == 4:
+            top, frt, bot, bak = bak, top, frt, bot
 
-        if brd[y][x] == 0:
-            brd[y][x] = dn
+        ans.append(str(top))
+
+        if not brd[cur]:
+            brd[cur] = bot
         else:
-            dn, brd[y][x] = brd[y][x], 0
+            bot, brd[cur] = brd[cur], 0
 
+    print('\n'.join(ans))
 
     # ######## INPUT AREA END ############
 

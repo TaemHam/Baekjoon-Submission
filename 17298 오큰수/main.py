@@ -1,4 +1,5 @@
 # CP template Version 1.006
+import io
 import os
 import sys
 #import string
@@ -21,21 +22,19 @@ def main(f=None):
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    n = int(input().strip())
-    arr = list(map(int, input().split()))
-    dp = [0] * n
+    input()
+    ans = []
     stk = []
 
-    for i in range(n-1, -1, -1):
-        while stk and arr[i] >= stk[-1]:
+    for i in reversed(list(map(int, input().split()))):
+        while stk and i >= stk[-1]:
             stk.pop()
 
-        if stk:
-            dp[i] = stk[-1]
+        ans.append(stk[-1] if stk else -1)
         
-        stk.append(arr[i])
+        stk.append(i)
     
-    print(' '.join(map(str, dp)))
+    print(' '.join(map(str, reversed(ans))))
 
     # ######## INPUT AREA END ############
 
@@ -70,7 +69,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
+    input = io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:
