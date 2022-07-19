@@ -1,10 +1,11 @@
 # CP template Version 1.006
+#import io
 import os
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
 #import itertools
-#from itertools import product
+#from itertools import combinations
 #import collections
 #from collections import deque
 #from collections import Counter, defaultdict as dd
@@ -12,43 +13,48 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import insort_left as il
 DEBUG = False
-
 
 def main(f=None):
     init(f)
-    # sys.setrecursionlimit(10**9)
+    #sys.setrecursionlimit(10**4)
     # ######## INPUT AREA BEGIN ##########
 
-    R, C = map(int, input().split())
-    L = C+1
-    dir = (1, -1, L, -L)
-    vis = [0] * L*R
-    grp = ''
-    ans = 0
-    for _ in range(R):
-        grp += input()
-    grp += '\n' * L
+    def udt(g, i, v):
+        while i <= len(g):
+            g[i] += v
+            i += i & -i
+
+    def rng_udt(l, r, v):
+        udt(dgrp, l, v)
+        udt(dgrp, r+1, -v)
+        udt(cgrp, l, (1-l)*v)
+        udt(cgrp, r+1, r*v)
+
+    def qry(g, i):
+        t = 0
+        while i:
+            t += g[i]
+            i -= i & -i
+        return t
+
+    N, M, K = map(int, input().split())
+    ans = []
+    cgrp = [0] * (10**6+10)
+    dgrp = [0] * (10**6+10)
+
+    for i in range(1, N+1):
+        rng_udt(i, i, int(input().strip()))
+
+    for _ in range(M+K):
+        cmd = list(map(int, input().split()))
+        if cmd[0] == 1:
+            rng_udt(*cmd[1:])
+        else:
+            ans.append(str(qry(dgrp, cmd[2])*cmd[2] + qry(cgrp, cmd[2]) - qry(dgrp, cmd[1]-1)*(cmd[1]-1) - qry(cgrp, cmd[1]-1)))
     
-    que = [(0, 1, 1 << ord(grp[0])-65)]
-    while que:
-        cur, cnt, bit = que.pop()
-        if ans < cnt:
-            ans = cnt
-            if ans == 26:
-                break
-        for d in dir:
-            if grp[cur+d] != '\n':
-                b = 1 << ord(grp[cur+d])-65
-                if not bit & b and vis[cur+d] ^ (bit|b):
-                    vis[cur+d] = bit|b
-                    que.append((cur+d, cnt+1, bit|b))
-
-    return ans
-
-    # ######## INPUT AREA END ############
-
+    return '\n'.join(ans)
 
 # TEMPLATE ###############################
 
@@ -80,7 +86,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline #io.BytesIO(os.read(0, os.fstat(0).st_size)).readline 
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

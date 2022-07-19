@@ -7,94 +7,47 @@ import sys
 #from itertools import product
 #import collections
 #from collections import deque
-from collections import defaultdict as dd
+#from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import bisect_left as bl
 DEBUG = False
-
 
 def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
-
-    n, m = map(int, input().split())
-    clr_d = dd(int)
-    for _ in range(n):
-        clr = input().strip()
-        p = 1
-        while p < len(clr):
-            tmp = clr[:p]
-            if clr_d[tmp] == 2:
-                clr_d[tmp] = 3
-            else:
-                clr_d[tmp] = 1
-            p += 1
-        else:
-            clr_d[clr] = 2
-
-    nck_d = dd(int)
-    for _ in range(m):
-        nck = input().strip()
-        p = 1
-        while p < len(nck):
-            tmp = nck[:p]
-            if nck_d[tmp] == 2:
-                nck_d[tmp] = 3
-            else:
-                nck_d[tmp] = 1
-            p += 1
-        else:
-            nck_d[nck] = 2
-
-    tc = int(input().strip())
-    for _ in range(tc):
-        team = input().strip()
-        p = 1
-        flg = 0
-        while p <= len(team):
-            tmp = team[:p]
-            if tmp in clr_d:
-                p += 1
-                if clr_d[tmp] == 1:
-                    continue
-                if clr_d[tmp] == 3:
-                    t = p+1
-                    if t < len(team) and team[:t] in clr_d:
-                        continue
-                flg = p-1
-                break
-            else:
-                break
-
-        if not flg:
-            print('No')
-            continue
-
-        fin = 0
-
-        while p <= len(team):
-            tmp = team[flg:p]
-            if tmp in nck_d:
-                p += 1
-                if nck_d[tmp] == 1:
-                    continue
-                if p <= len(team):
-                    continue
-                fin = 1
-                break
-            else:
-                break
-        if fin == 0:
-            print('No')
-        else:
-            print('Yes')
-
-
     
+    N, K = map(int, input().split())
+    D = len(format(N-1, 'b'))
+    H = 2**D
+    grp = [0] * H + [1] * N + [0] * (H-N)
+    ans = []
+    cur = 1
+    H -= 1
+
+    for idx in range(H, 0, -1):
+        grp[idx] = grp[idx*2] + grp[idx*2+1]
+
+    for ppl in range(N, 0, -1):
+
+        cur = num = (cur + K - 2) % ppl + 1
+
+        for _ in range(D):
+            idx <<= 1
+            if grp[idx] < num:
+                num -= grp[idx]
+                idx += 1
+
+        ans.append(str(idx-H))
+
+        for _ in range(D):
+            grp[idx] -= 1
+            idx >>= 1
+    
+    return f'<{", ".join(ans)}>'
 
     # ######## INPUT AREA END ############
 
@@ -161,4 +114,4 @@ def parr(arr):
 
 
 if __name__ == "__main__":
-    main()
+    print(main())

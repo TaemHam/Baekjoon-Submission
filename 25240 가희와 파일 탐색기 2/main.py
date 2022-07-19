@@ -12,40 +12,57 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import bisect_left as bl
 DEBUG = False
-
 
 def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    R, C = map(int, input().split())
-    L = C+1
-    dir = (1, -1, L, -L)
-    vis = [0] * L*R
-    grp = ''
-    ans = 0
-    for _ in range(R):
-        grp += input()
-    grp += '\n' * L
-    
-    que = [(0, 1, 1 << ord(grp[0])-65)]
-    while que:
-        cur, cnt, bit = que.pop()
-        if ans < cnt:
-            ans = cnt
-            if ans == 26:
-                break
-        for d in dir:
-            if grp[cur+d] != '\n':
-                b = 1 << ord(grp[cur+d])-65
-                if not bit & b and vis[cur+d] ^ (bit|b):
-                    vis[cur+d] = bit|b
-                    que.append((cur+d, cnt+1, bit|b))
+    def check(oprt, prms):
+        if oprt == 'R':
+            res = 6 & prms
+        elif oprt == 'W':
+            res = 2 & prms
+        else: #oprt == 'X':
+            res = 1 & prms
+        ans.append('1' if res else '0')
 
-    return ans
+    U, F = map(int, input().split())
+    grp_dic = {}
+    prm_dic = {}
+    for _ in range(U):
+        user_name, *user_group = input().split()
+        if user_name in grp_dic:
+            grp_dic[user_name].append(user_name)
+        else:
+            grp_dic[user_name] = [user_name]
+
+        if user_group:
+            for group_name in user_group[0].split(','):
+                if group_name in grp_dic:
+                    grp_dic[group_name].append(user_name)
+                else:
+                    grp_dic[group_name] = [user_name]
+    
+    for _ in range(F):
+        file_name, *file_info = input().split()
+        file_info[0] = tuple(map(int, file_info[0]))
+        prm_dic[file_name] = file_info
+    
+    ans = []
+    perm = {'R':6, 'W':2, 'X':1}
+    for _ in range(int(input().strip())):
+        name, file, oprt = input().split()
+        if name == prm_dic[file][1]:
+            ans.append('1' if perm[oprt] & prm_dic[file][0][0] else '0')
+        elif name in grp_dic[prm_dic[file][2]]:
+            ans.append('1' if perm[oprt] & prm_dic[file][0][1] else '0')
+        else:
+            ans.append('1' if perm[oprt] & prm_dic[file][0][2] else '0')
+
+    return '\n'.join(ans)
 
     # ######## INPUT AREA END ############
 
@@ -80,7 +97,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

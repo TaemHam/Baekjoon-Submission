@@ -12,38 +12,40 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import bisect_left as bl
 DEBUG = False
-
 
 def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    R, C = map(int, input().split())
-    L = C+1
-    dir = (1, -1, L, -L)
-    vis = [0] * L*R
-    grp = ''
-    ans = 0
-    for _ in range(R):
-        grp += input()
-    grp += '\n' * L
+    def udt(i, t, v):
+        while i < len(t):
+            t[i] += v
+            i += i & -i
+
+    def qry(i, t):
+        r = 0
+        while i:
+            r += t[i]
+            i -= i & -i
+        return r
     
-    que = [(0, 1, 1 << ord(grp[0])-65)]
-    while que:
-        cur, cnt, bit = que.pop()
-        if ans < cnt:
-            ans = cnt
-            if ans == 26:
-                break
-        for d in dir:
-            if grp[cur+d] != '\n':
-                b = 1 << ord(grp[cur+d])-65
-                if not bit & b and vis[cur+d] ^ (bit|b):
-                    vis[cur+d] = bit|b
-                    que.append((cur+d, cnt+1, bit|b))
+    N = int(input().strip())
+    mod = 1000000007
+    ans = 1
+    loc = [0] * 200001
+    cnt = [0] * 200001
+
+    cur = int(input().strip()) + 1
+    udt(cur, loc, cur)
+    udt(cur, cnt, 1)
+    for c in range(1, N):
+        cur = int(input().strip()) + 1
+        ans = ans * (cur * (2*qry(cur, cnt) - c) + qry(200000, loc) - 2*qry(cur, loc)) % mod
+        udt(cur, loc, cur)
+        udt(cur, cnt, 1)
 
     return ans
 
@@ -80,7 +82,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

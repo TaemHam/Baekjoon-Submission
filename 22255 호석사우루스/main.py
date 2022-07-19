@@ -1,54 +1,57 @@
 # CP template Version 1.006
+#import io
 import os
 import sys
 #import string
 #from functools import cmp_to_key, reduce, partial
 #import itertools
-#from itertools import product
+#from itertools import combinations
 #import collections
 #from collections import deque
 #from collections import Counter, defaultdict as dd
 #import math
 #from math import log, log2, ceil, floor, gcd, sqrt
-#from heapq import heappush, heappop
+from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import insort_left as il
 DEBUG = False
-
 
 def main(f=None):
     init(f)
-    # sys.setrecursionlimit(10**9)
+    #sys.setrecursionlimit(10**4)
     # ######## INPUT AREA BEGIN ##########
+    N, M = map(int, input().split())
+    SR, SC, ER, EC = map(lambda x: int(x)-1, input().split())
+    L = M+1
+    vis = [[int(1e9)] * N*L for _ in range(3)]
+    mov = ((L, -L, 1, -1), (L, -L), (1, -1))
+    brd = [-1] * (N+1)*L
+    tgt = ER * L + EC
+    ans = -1
 
-    R, C = map(int, input().split())
-    L = C+1
-    dir = (1, -1, L, -L)
-    vis = [0] * L*R
-    grp = ''
-    ans = 0
-    for _ in range(R):
-        grp += input()
-    grp += '\n' * L
-    
-    que = [(0, 1, 1 << ord(grp[0])-65)]
-    while que:
-        cur, cnt, bit = que.pop()
-        if ans < cnt:
-            ans = cnt
-            if ans == 26:
-                break
-        for d in dir:
-            if grp[cur+d] != '\n':
-                b = 1 << ord(grp[cur+d])-65
-                if not bit & b and vis[cur+d] ^ (bit|b):
-                    vis[cur+d] = bit|b
-                    que.append((cur+d, cnt+1, bit|b))
+    for y in range(0, N*L, L):
+        brd[y:y+M] = map(int, input().split())
 
+
+    vis[0][SR * L + SC] = 0
+    heap = [(0, SR * L + SC, 0)]
+    while heap:
+        imp, cur, day = heappop(heap)
+
+        if imp > vis[day][cur]:
+            continue
+
+        if cur == tgt:
+            ans = imp
+            break
+
+        day = (day+1)%3
+        for d in mov[day]:
+            if brd[cur+d] != -1 and imp + brd[cur+d] < vis[day][cur+d]:
+                vis[day][cur+d] = imp + brd[cur+d]
+                heappush(heap, (vis[day][cur+d], cur+d, day))
+        
     return ans
-
-    # ######## INPUT AREA END ############
-
 
 # TEMPLATE ###############################
 
@@ -80,7 +83,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline #io.BytesIO(os.read(0, os.fstat(0).st_size)).readline 
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:

@@ -12,40 +12,51 @@ import sys
 #from math import log, log2, ceil, floor, gcd, sqrt
 #from heapq import heappush, heappop
 #import bisect
-#from bisect import bisect_left as bl, bisect_right as br
+#from bisect import bisect_left as bl
 DEBUG = False
-
 
 def main(f=None):
     init(f)
     # sys.setrecursionlimit(10**9)
     # ######## INPUT AREA BEGIN ##########
 
-    R, C = map(int, input().split())
-    L = C+1
-    dir = (1, -1, L, -L)
-    vis = [0] * L*R
-    grp = ''
-    ans = 0
-    for _ in range(R):
-        grp += input()
-    grp += '\n' * L
-    
-    que = [(0, 1, 1 << ord(grp[0])-65)]
-    while que:
-        cur, cnt, bit = que.pop()
-        if ans < cnt:
-            ans = cnt
-            if ans == 26:
-                break
-        for d in dir:
-            if grp[cur+d] != '\n':
-                b = 1 << ord(grp[cur+d])-65
-                if not bit & b and vis[cur+d] ^ (bit|b):
-                    vis[cur+d] = bit|b
-                    que.append((cur+d, cnt+1, bit|b))
+    def isrt(tri, wrd):
+        cur = 0
+        for alp in wrd:
+            num = ord(alp) - 96
+            if tri[cur][num] == -1:
+                tri[cur][num] = len(tri)
+                tri.append(ori[:])
+            cur = tri[cur][num]
+        tri[cur][0] = 1
 
-    return ans
+    C, N = map(int, input().split())
+    ori = [0] + [-1] * 26
+    clr = [ori[:]]
+    nik = set()
+    ans = []
+    for _ in range(C):
+        isrt(clr, input().strip())
+    for _ in range(N):
+        nik.add(input().strip())
+    
+    for _ in range(int(input().strip())):
+        team = input().strip()
+        ccur = 0
+        for i in range(len(team)):
+            if clr[ccur][0]:
+                if team[i:] in nik:
+                    ans.append('Yes')
+                    break
+            ccur = clr[ccur][ord(team[i])-96]
+            if ccur == -1:
+                ans.append('No')
+                break
+        else:
+            ans.append('No')
+    
+    return '\n'.join(ans)
+
 
     # ######## INPUT AREA END ############
 
@@ -80,7 +91,7 @@ def setStdin(f):
 
 def init(f=None):
     global input
-    input = sys.stdin.readline  # by default
+    input = sys.stdin.readline  # io.BytesIO(os.read(0, os.fstat(0).st_size)).readline
     if os.path.exists("o"):
         sys.stdout = open("o", "w")
     if f is not None:
